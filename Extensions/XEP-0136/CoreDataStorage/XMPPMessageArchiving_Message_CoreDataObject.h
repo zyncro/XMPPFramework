@@ -2,6 +2,11 @@
 #import <CoreData/CoreData.h>
 #import "XMPP.h"
 
+typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageStatus) {
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusPending = 0,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent    = 1,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusReceived = 2,
+};
 
 @interface XMPPMessageArchiving_Message_CoreDataObject : NSManagedObject
 
@@ -31,7 +36,10 @@
 
 @property (nonatomic, strong) NSString * streamBareJidStr;
 
-/**
+@property (strong, nonatomic) NSString *messageId;
+@property (assign, nonatomic) XMPPMessageArchiving_Message_CoreDataObjectMessageStatus messageStatus;
+
+/**alm
  * This method is called immediately before the object is inserted into the managedObjectContext.
  * At this point, all normal properties have been set.
  * 

@@ -23,6 +23,8 @@
 @dynamic composing;
 @dynamic timestamp;
 @dynamic streamBareJidStr;
+@dynamic messageStatus;
+@dynamic messageId;
 
 #pragma mark Transient message
 
@@ -131,6 +133,7 @@
 	[self didChangeValueForKey:@"bareJid"];
 	[self didChangeValueForKey:@"bareJidStr"];
 }
+
 
 #pragma mark Convenience properties
 
