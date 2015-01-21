@@ -1,8 +1,9 @@
 {
   "name": "XMPPFramework",
-  "version": "3.6.1",
+  "version": "3.6.4",
   "platforms": {
-    "ios": "5.0"
+    "ios": "5.0",
+    "osx": "10.7"
   },
   "license": {
     "type": "BSD",
@@ -15,7 +16,7 @@
   },
   "source": {
     "git": "https://github.com/robbiehanson/XMPPFramework.git",
-    "tag": "3.6.1"
+    "tag": "3.6.4"
   },
   "resources": [
     "**/*.{xcdatamodel,xcdatamodeld}"
@@ -444,10 +445,23 @@
       "prefix_header_contents": "#define HAVE_XMPP_SUBSPEC_XEP_0224"
     },
     {
+      "name": "XEP-0280",
+      "source_files": "Extensions/XEP-0280/**/*.{h,m}",
+      "dependencies": {
+        "XMPPFramework/Core": [
+
+        ]
+      },
+      "prefix_header_contents": "#define HAVE_XMPP_SUBSPEC_XEP_0280"
+    },
+    {
       "name": "XEP-0297",
       "source_files": "Extensions/XEP-0297/**/*.{h,m}",
       "dependencies": {
         "XMPPFramework/Core": [
+
+        ],
+        "XMPPFramework/XEP-0203": [
 
         ]
       },
@@ -462,6 +476,26 @@
         ]
       },
       "prefix_header_contents": "#define HAVE_XMPP_SUBSPEC_XEP_0308"
+    },
+    {
+      "name": "XEP-0333",
+      "source_files": "Extensions/XEP-0333/**/*.{h,m}",
+      "dependencies": {
+        "XMPPFramework/Core": [
+
+        ]
+      },
+      "prefix_header_contents": "#define HAVE_XMPP_SUBSPEC_XEP_0333"
+    },
+    {
+      "name": "XEP-0335",
+      "source_files": "Extensions/XEP-0335/**/*.{h,m}",
+      "dependencies": {
+        "XMPPFramework/Core": [
+
+        ]
+      },
+      "prefix_header_contents": "#define HAVE_XMPP_SUBSPEC_XEP_0335"
     }
   ]
 }
