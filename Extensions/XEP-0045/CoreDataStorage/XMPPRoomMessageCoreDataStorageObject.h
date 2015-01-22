@@ -4,6 +4,11 @@
 #import "XMPP.h"
 #import "XMPPRoom.h"
 
+typedef NS_ENUM(int16_t, XMPPRoomMessageCoreDataStorageObjectMessageStatus) {
+    XMPPRoomMessageCoreDataStorageObjectMessageStatusPending = 0,
+    XMPPRoomMessageCoreDataStorageObjectMessageStatusSent    = 1,
+    XMPPRoomMessageCoreDataStorageObjectMessageStatusReceived = 2,
+};
 
 @interface XMPPRoomMessageCoreDataStorageObject : NSManagedObject <XMPPRoomMessage>
 
@@ -28,6 +33,8 @@
 
 @property (nonatomic, assign) BOOL isFromMe;
 @property (nonatomic, strong) NSNumber * fromMe;
+
+@property (assign, nonatomic) XMPPRoomMessageCoreDataStorageObjectMessageStatus messageStatus;
 
 /**
  * The 'type' property can be used to inject event messages.
