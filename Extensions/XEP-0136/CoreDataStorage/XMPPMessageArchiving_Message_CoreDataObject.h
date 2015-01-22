@@ -6,6 +6,7 @@ typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageStatu
     XMPPMessageArchiving_Message_CoreDataObjectMessageStatusPending = 0,
     XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent    = 1,
     XMPPMessageArchiving_Message_CoreDataObjectMessageStatusReceived = 2,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusFailed = 3,
 };
 
 @interface XMPPMessageArchiving_Message_CoreDataObject : NSManagedObject

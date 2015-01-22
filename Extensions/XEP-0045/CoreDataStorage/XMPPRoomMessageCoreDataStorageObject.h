@@ -8,6 +8,7 @@ typedef NS_ENUM(int16_t, XMPPRoomMessageCoreDataStorageObjectMessageStatus) {
     XMPPRoomMessageCoreDataStorageObjectMessageStatusPending = 0,
     XMPPRoomMessageCoreDataStorageObjectMessageStatusSent    = 1,
     XMPPRoomMessageCoreDataStorageObjectMessageStatusReceived = 2,
+    XMPPRoomMessageCoreDataStorageObjectMessageStatusFailed = 3,
 };
 
 @interface XMPPRoomMessageCoreDataStorageObject : NSManagedObject <XMPPRoomMessage>
