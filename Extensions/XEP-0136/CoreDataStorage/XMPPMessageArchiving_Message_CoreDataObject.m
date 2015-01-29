@@ -21,7 +21,8 @@
 @dynamic thread;
 @dynamic outgoing;
 @dynamic composing;
-@dynamic timestamp;
+@dynamic localTimestamp;
+@dynamic remoteTimestamp;
 @dynamic streamBareJidStr;
 @dynamic messageStatus;
 @dynamic messageId;

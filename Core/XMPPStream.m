@@ -5,6 +5,7 @@
 #import "XMPPIDTracker.h"
 #import "XMPPSRVResolver.h"
 #import "NSData+XMPP.h"
+#import "XMPPMessage+XEP_0085.h" // Message chat state
 
 #import <objc/runtime.h>
 #import <libkern/OSAtomic.h>
@@ -2267,7 +2268,10 @@ enum XMPPStreamConfig
 - (void)sendMessage:(XMPPMessage *)message withTag:(long)tag
 {
 	NSAssert(dispatch_get_specific(xmppQueueTag), @"Invoked on incorrect queue");
-	NSAssert(state == STATE_XMPP_CONNECTED, @"Invoked with incorrect state");
+	NSAssert(state == STATE_XMPP_CONNECTED
+// BEGIN Zyncro
+             || !message.hasChatState, @"Invoked with incorrect state");
+// END Zyncro
 	
 	// We're getting ready to send a message.
 	// Notify delegates to allow them to optionally alter/filter the outgoing message.
@@ -2551,17 +2555,17 @@ enum XMPPStreamConfig
 {
 	if (element == nil) return;
 	
-	dispatch_block_t block = ^{ @autoreleasepool {
-		
-		if (state == STATE_XMPP_CONNECTED)
-		{
-			[self sendElement:element withTag:TAG_XMPP_WRITE_STREAM];
-		}
-		else
-		{
-			[self failToSendElement:element];
-		}
-	}};
+    dispatch_block_t block = ^{ @autoreleasepool {
+        
+        if (state == STATE_XMPP_CONNECTED)
+        {
+            [self sendElement:element withTag:TAG_XMPP_WRITE_STREAM];
+        }
+        else
+        {
+            [self failToSendElement:element];
+        }
+    }};
 	
 	if (dispatch_get_specific(xmppQueueTag))
 		block();

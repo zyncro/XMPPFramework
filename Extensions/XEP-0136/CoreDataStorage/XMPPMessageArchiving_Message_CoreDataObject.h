@@ -33,14 +33,15 @@ typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageStatu
 @property (nonatomic, strong) NSNumber * composing;   // Use isComposing
 @property (nonatomic, assign) BOOL isComposing;       // Convenience property
 
-@property (nonatomic, strong) NSDate * timestamp;
+@property (nonatomic, strong) NSDate * localTimestamp;
+@property (nonatomic, strong) NSDate * remoteTimestamp;
 
 @property (nonatomic, strong) NSString * streamBareJidStr;
 
 @property (strong, nonatomic) NSString *messageId;
 @property (assign, nonatomic) XMPPMessageArchiving_Message_CoreDataObjectMessageStatus messageStatus;
 
-/**alm
+/**
  * This method is called immediately before the object is inserted into the managedObjectContext.
  * At this point, all normal properties have been set.
  * 
