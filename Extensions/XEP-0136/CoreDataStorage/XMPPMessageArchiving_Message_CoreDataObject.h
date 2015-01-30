@@ -41,6 +41,8 @@ typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageStatu
 @property (strong, nonatomic) NSString *messageId;
 @property (assign, nonatomic) XMPPMessageArchiving_Message_CoreDataObjectMessageStatus messageStatus;
 
+@property (strong, nonatomic) NSString *userString;
+
 /**
  * This method is called immediately before the object is inserted into the managedObjectContext.
  * At this point, all normal properties have been set.

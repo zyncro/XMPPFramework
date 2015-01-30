@@ -26,6 +26,7 @@
 @dynamic streamBareJidStr;
 @dynamic messageStatus;
 @dynamic messageId;
+@dynamic userString;
 
 #pragma mark Transient message
 

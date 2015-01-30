@@ -3,6 +3,8 @@
 #import "XMPPLogging.h"
 #import "NSXMLElement+XEP_0203.h"
 #import "XMPPMessage+XEP_0085.h"
+#import "XMPPMessage+XEP0045.h"
+
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -382,31 +384,30 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 				return;
 			}
 		}
-	}
-	
+    }
+    
 	[self scheduleBlock:^{
-		
-		NSManagedObjectContext *moc = [self managedObjectContext];
-		XMPPJID *myJid = [self myJIDForXMPPStream:xmppStream];
-		
-		XMPPJID *messageJid = isOutgoing ? [message to] : [message from];
-		
-// BEGIN Zyncro
         if ([messageBody length] == 0) {
             return; // Do NOT insert in DB
         }
+        
         XMPPMessageArchiving_Message_CoreDataObject *archivedMessage = nil;
-// END Zyncro
+        NSManagedObjectContext *moc = [self managedObjectContext];
         
-// BEGIN Zyncro
-//		// Fetch-n-Update OR Insert new message
-//        XMPPMessageArchiving_Message_CoreDataObject *archivedMessage =
-//        [self composingMessageWithJid:messageJid
-//                            streamJid:myJid
-//                             outgoing:isOutgoing
-//                 managedObjectContext:moc];
-// END Zyncro
+        if (messageBody.length > 0 && message.isErrorMessage && message.elementID.length > 0) {
+            // If we receive an error message with body & ID, it means there was an error sending
+            // this message. Mark the archived message as 'Failed' and do NOT insert this new one.
+            archivedMessage = [self archivedMessageWithMessageId:message.elementID inManagedObjectContext:moc];
+            archivedMessage.messageStatus = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusFailed;
+            return; // Do not insert this one
+        }
         
+        XMPPJID *myJid = [self myJIDForXMPPStream:xmppStream];
+        if (!isOutgoing && message.body.length > 0 && [message.from.resource isEqualToString:myJid.user]) {
+            // If the message was sent by me (group echo), do NOT insert it in the DB.
+            return;
+        }
+		
 		if (shouldDeleteComposingMessage)
 		{
 			if (archivedMessage)
@@ -434,6 +435,8 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 				didCreateNewArchivedMessage = YES;
 			}
             
+            XMPPJID *messageJid = isOutgoing ? [message to] : [message from];
+            
             if (didCreateNewArchivedMessage) {
                 archivedMessage.message = message;
                 archivedMessage.body = messageBody;
@@ -454,12 +457,14 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 archivedMessage.isOutgoing = isOutgoing;
                 archivedMessage.isComposing = isComposing;
                 
-                //
                 if (isOutgoing && !isComposing) {
                     archivedMessage.messageId = [[message attributeForName:@"id"] stringValue];
                     archivedMessage.messageStatus = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent;
                 }
-                //
+                
+                if (message.isGroupChatMessage) {
+                    archivedMessage.userString = message.from.resource;
+                }
                 
                 XMPPLogVerbose(@"New archivedMessage: %@", archivedMessage);
                                                              
