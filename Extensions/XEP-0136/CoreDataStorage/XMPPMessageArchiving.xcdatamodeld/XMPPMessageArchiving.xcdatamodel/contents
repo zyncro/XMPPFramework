@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6254" systemVersion="14B25" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6254" systemVersion="14C109" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="XMPPMessageArchiving_Contact_CoreDataObject" representedClassName="XMPPMessageArchiving_Contact_CoreDataObject" syncable="YES">
+        <attribute name="badgeUnreadMessages" optional="YES" attributeType="Integer 16" minValueString="0" defaultValueString="0" syncable="YES"/>
         <attribute name="bareJid" optional="YES" transient="YES" syncable="YES"/>
         <attribute name="bareJidStr" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="mostRecentMessageBody" optional="YES" attributeType="String" syncable="YES"/>
@@ -25,7 +26,7 @@
         <attribute name="userString" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="XMPPMessageArchiving_Contact_CoreDataObject" positionX="160" positionY="192" width="128" height="135"/>
+        <element name="XMPPMessageArchiving_Contact_CoreDataObject" positionX="-182" positionY="198" width="128" height="148"/>
         <element name="XMPPMessageArchiving_Message_CoreDataObject" positionX="160" positionY="192" width="128" height="255"/>
     </elements>
 </model>

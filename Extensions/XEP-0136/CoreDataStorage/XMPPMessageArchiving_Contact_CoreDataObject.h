@@ -13,6 +13,7 @@
 @property (nonatomic, strong) NSNumber * mostRecentMessageOutgoing;
 
 @property (nonatomic, strong) NSString * streamBareJidStr;
+@property (assign, nonatomic) int16_t badgeUnreadMessages;
 
 /**
  * This method is called immediately before the object is inserted into the managedObjectContext.
