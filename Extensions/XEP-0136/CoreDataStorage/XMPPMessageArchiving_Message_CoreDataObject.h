@@ -2,6 +2,12 @@
 #import <CoreData/CoreData.h>
 #import "XMPP.h"
 
+typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageStatus) {
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusPending = 0,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent    = 1,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusReceived = 2,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusFailed = 3,
+};
 
 @interface XMPPMessageArchiving_Message_CoreDataObject : NSManagedObject
 
@@ -27,9 +33,15 @@
 @property (nonatomic, strong) NSNumber * composing;   // Use isComposing
 @property (nonatomic, assign) BOOL isComposing;       // Convenience property
 
-@property (nonatomic, strong) NSDate * timestamp;
+@property (nonatomic, strong) NSDate * localTimestamp;
+@property (nonatomic, strong) NSDate * remoteTimestamp;
 
 @property (nonatomic, strong) NSString * streamBareJidStr;
+
+@property (strong, nonatomic) NSString *messageId;
+@property (assign, nonatomic) XMPPMessageArchiving_Message_CoreDataObjectMessageStatus messageStatus;
+
+@property (strong, nonatomic) NSString *userString;
 
 /**
  * This method is called immediately before the object is inserted into the managedObjectContext.

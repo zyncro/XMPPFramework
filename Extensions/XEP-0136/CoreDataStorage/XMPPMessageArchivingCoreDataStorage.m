@@ -3,6 +3,8 @@
 #import "XMPPLogging.h"
 #import "NSXMLElement+XEP_0203.h"
 #import "XMPPMessage+XEP_0085.h"
+#import "XMPPMessage+XEP0045.h"
+
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -167,9 +169,9 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 	NSString *predicateFrmt = @"composing == YES AND bareJidStr == %@ AND outgoing == %@ AND streamBareJidStr == %@";
 	NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateFrmt,
 	                             [messageJid bare], [NSNumber numberWithBool:isOutgoing], [streamJid bare]];
-	
-	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"timestamp" ascending:NO];
-	
+// BEGIN ZYNCRO
+	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"localTimestamp" ascending:NO];
+// END ZYNCRO
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	fetchRequest.entity = messageEntity;
 	fetchRequest.predicate = predicate;
@@ -189,6 +191,28 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 	}
 	
 	return result;
+}
+
+- (XMPPMessageArchiving_Message_CoreDataObject *)archivedMessageWithMessageId:(NSString *)messageId inManagedObjectContext:(NSManagedObjectContext *)moc {
+    if (!messageId || messageId.length == 0) {
+        return nil;
+    }
+    
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    request.entity      = [self messageEntity:moc];
+    request.predicate   = [NSPredicate predicateWithFormat:@"messageId == %@", messageId];
+    request.fetchLimit  = 1;
+    
+    NSError *error;
+    NSArray *messages = [moc executeFetchRequest:request error:&error];
+    
+    XMPPMessageArchiving_Message_CoreDataObject *message = nil;
+    if (messages.count == 0) {
+        XMPPLogError(@"Error, no archived message with id '%@' found.", messageId);
+    } else {
+        message = messages[0];
+    }
+    return message;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -360,22 +384,29 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 				return;
 			}
 		}
-	}
-	
+    }
+    
 	[self scheduleBlock:^{
-		
-		NSManagedObjectContext *moc = [self managedObjectContext];
-		XMPPJID *myJid = [self myJIDForXMPPStream:xmppStream];
-		
-		XMPPJID *messageJid = isOutgoing ? [message to] : [message from];
-		
-		// Fetch-n-Update OR Insert new message
-		
-		XMPPMessageArchiving_Message_CoreDataObject *archivedMessage =
-		    [self composingMessageWithJid:messageJid
-		                        streamJid:myJid
-		                         outgoing:isOutgoing
-		             managedObjectContext:moc];
+        if ([messageBody length] == 0) {
+            return; // Do NOT insert in DB
+        }
+        
+        XMPPMessageArchiving_Message_CoreDataObject *archivedMessage = nil;
+        NSManagedObjectContext *moc = [self managedObjectContext];
+        
+        if (messageBody.length > 0 && message.isErrorMessage && message.elementID.length > 0) {
+            // If we receive an error message with body & ID, it means there was an error sending
+            // this message. Mark the archived message as 'Failed' and do NOT insert this new one.
+            archivedMessage = [self archivedMessageWithMessageId:message.elementID inManagedObjectContext:moc];
+            archivedMessage.messageStatus = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusFailed;
+            return; // Do not insert this one
+        }
+        
+        XMPPJID *myJid = [self myJIDForXMPPStream:xmppStream];
+        if (!isOutgoing && message.body.length > 0 && [message.from.resource isEqualToString:myJid.user]) {
+            // If the message was sent by me (group echo), do NOT insert it in the DB.
+            return;
+        }
 		
 		if (shouldDeleteComposingMessage)
 		{
@@ -392,51 +423,67 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 		else
 		{
 			XMPPLogVerbose(@"Previous archivedMessage: %@", archivedMessage);
-			
-			BOOL didCreateNewArchivedMessage = NO;
-			if (archivedMessage == nil)
-			{
-				archivedMessage = (XMPPMessageArchiving_Message_CoreDataObject *)
+            
+            BOOL didCreateNewArchivedMessage = NO;
+            if (isOutgoing) {
+                archivedMessage = [self archivedMessageWithMessageId:message.elementID inManagedObjectContext:moc];
+            } else {
+            	archivedMessage = (XMPPMessageArchiving_Message_CoreDataObject *)
 					[[NSManagedObject alloc] initWithEntity:[self messageEntity:moc]
 				             insertIntoManagedObjectContext:nil];
 				
 				didCreateNewArchivedMessage = YES;
 			}
-			
-			archivedMessage.message = message;
-			archivedMessage.body = messageBody;
-			
-			archivedMessage.bareJid = [messageJid bareJID];
-			archivedMessage.streamBareJidStr = [myJid bare];
-			
-			NSDate *timestamp = [message delayedDeliveryDate];
-			if (timestamp)
-				archivedMessage.timestamp = timestamp;
-			else
-				archivedMessage.timestamp = [[NSDate alloc] init];
-			
-			archivedMessage.thread = [[message elementForName:@"thread"] stringValue];
-			archivedMessage.isOutgoing = isOutgoing;
-			archivedMessage.isComposing = isComposing;
-			
-			XMPPLogVerbose(@"New archivedMessage: %@", archivedMessage);
-														 
-			if (didCreateNewArchivedMessage) // [archivedMessage isInserted] doesn't seem to work
-			{
-				XMPPLogVerbose(@"Inserting message...");
-				
-				[archivedMessage willInsertObject];       // Override hook
-				[self willInsertMessage:archivedMessage]; // Override hook
-				[moc insertObject:archivedMessage];
-			}
-			else
-			{
-				XMPPLogVerbose(@"Updating message...");
-				
-				[archivedMessage didUpdateObject];       // Override hook
-				[self didUpdateMessage:archivedMessage]; // Override hook
-			}
-			
+            
+            XMPPJID *messageJid = isOutgoing ? [message to] : [message from];
+            
+            if (didCreateNewArchivedMessage) {
+                archivedMessage.message = message;
+                archivedMessage.body = messageBody;
+                
+                archivedMessage.bareJid = [messageJid bareJID];
+                archivedMessage.streamBareJidStr = [myJid bare];
+                
+                // Create new local timestamp
+                archivedMessage.localTimestamp = [[NSDate alloc] init];
+                
+                NSDate *timestamp = [message delayedDeliveryDate];
+                if (timestamp)
+                    archivedMessage.remoteTimestamp = timestamp;
+                else
+                    archivedMessage.remoteTimestamp = archivedMessage.localTimestamp;
+                
+                archivedMessage.thread = [[message elementForName:@"thread"] stringValue];
+                archivedMessage.isOutgoing = isOutgoing;
+                archivedMessage.isComposing = isComposing;
+                
+                if (isOutgoing && !isComposing) {
+                    archivedMessage.messageId = [[message attributeForName:@"id"] stringValue];
+                    archivedMessage.messageStatus = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent;
+                }
+                
+                if (message.isGroupChatMessage) {
+                    archivedMessage.userString = message.from.resource;
+                }
+                
+                XMPPLogVerbose(@"New archivedMessage: %@", archivedMessage);
+                                                             
+                if (didCreateNewArchivedMessage) // [archivedMessage isInserted] doesn't seem to work
+                {
+                    XMPPLogVerbose(@"Inserting message...");
+                    
+                    [archivedMessage willInsertObject];       // Override hook
+                    [self willInsertMessage:archivedMessage]; // Override hook
+                    [moc insertObject:archivedMessage];
+                }
+                else
+                {
+                    XMPPLogVerbose(@"Updating message...");
+
+                    [archivedMessage didUpdateObject];       // Override hook
+                    [self didUpdateMessage:archivedMessage]; // Override hook
+                }
+            }
 			// Create or update contact (if message with actual content)
 			
 			if ([messageBody length] > 0)
@@ -458,7 +505,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 				contact.streamBareJidStr = archivedMessage.streamBareJidStr;
 				contact.bareJid = archivedMessage.bareJid;
 					
-				contact.mostRecentMessageTimestamp = archivedMessage.timestamp;
+				contact.mostRecentMessageTimestamp = archivedMessage.remoteTimestamp;
 				contact.mostRecentMessageBody = archivedMessage.body;
 				contact.mostRecentMessageOutgoing = [NSNumber numberWithBool:isOutgoing];
 				

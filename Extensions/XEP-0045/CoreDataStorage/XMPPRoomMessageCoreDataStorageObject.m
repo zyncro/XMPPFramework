@@ -39,6 +39,7 @@
 @dynamic remoteTimestamp;
 @dynamic isFromMe;
 @dynamic fromMe;
+@dynamic messageStatus;
 
 @dynamic type;
 

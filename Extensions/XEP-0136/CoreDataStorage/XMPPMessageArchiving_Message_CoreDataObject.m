@@ -21,8 +21,12 @@
 @dynamic thread;
 @dynamic outgoing;
 @dynamic composing;
-@dynamic timestamp;
+@dynamic localTimestamp;
+@dynamic remoteTimestamp;
 @dynamic streamBareJidStr;
+@dynamic messageStatus;
+@dynamic messageId;
+@dynamic userString;
 
 #pragma mark Transient message
 
@@ -131,6 +135,7 @@
 	[self didChangeValueForKey:@"bareJid"];
 	[self didChangeValueForKey:@"bareJidStr"];
 }
+
 
 #pragma mark Convenience properties
 
