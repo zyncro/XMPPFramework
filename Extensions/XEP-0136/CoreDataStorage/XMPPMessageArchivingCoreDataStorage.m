@@ -1,10 +1,9 @@
- #import "XMPPMessageArchivingCoreDataStorage.h"
+#import "XMPPMessageArchivingCoreDataStorage.h"
 #import "XMPPCoreDataStorageProtected.h"
 #import "XMPPLogging.h"
 #import "NSXMLElement+XEP_0203.h"
 #import "XMPPMessage+XEP_0085.h"
 #import "XMPPMessage+XEP0045.h"
-
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -168,14 +167,14 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 	
 	NSString *predicateFrmt = @"composing == YES AND bareJidStr == %@ AND outgoing == %@ AND streamBareJidStr == %@";
 	NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateFrmt,
-	                             [messageJid bare], [NSNumber numberWithBool:isOutgoing], [streamJid bare]];
+	                             [messageJid bare],  @(isOutgoing), [streamJid bare]];
 // BEGIN ZYNCRO
 	NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:@"localTimestamp" ascending:NO];
 // END ZYNCRO
 	NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
 	fetchRequest.entity = messageEntity;
 	fetchRequest.predicate = predicate;
-	fetchRequest.sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
+	fetchRequest.sortDescriptors = @[sortDescriptor];
 	fetchRequest.fetchLimit = 1;
 	
 	NSError *error = nil;
@@ -507,7 +506,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 					
 				contact.mostRecentMessageTimestamp = archivedMessage.remoteTimestamp;
 				contact.mostRecentMessageBody = archivedMessage.body;
-				contact.mostRecentMessageOutgoing = [NSNumber numberWithBool:isOutgoing];
+				contact.mostRecentMessageOutgoing = @(isOutgoing);
                 
                 if (!isOutgoing) {
                     contact.badgeUnreadMessages += 1;
