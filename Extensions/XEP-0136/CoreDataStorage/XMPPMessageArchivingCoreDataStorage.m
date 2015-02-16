@@ -360,6 +360,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 	NSString *messageBody = [[message elementForName:@"body"] stringValue];
 	BOOL isComposing = NO;
 	BOOL shouldDeleteComposingMessage = NO;
+    BOOL isCarbonMessage = ([message.from.bare isEqualToString:[xmppStream myJID].bare] && !isOutgoing) ? YES : NO;
 	
 	if ([messageBody length] == 0)
 	{
@@ -460,10 +461,23 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                     archivedMessage.messageId = [[message attributeForName:@"id"] stringValue];
                     archivedMessage.messageStatus = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent;
                 }
+            
+                //  CARBON - Update values
+                if (isCarbonMessage) {
+                    archivedMessage.bareJid = message.to.bareJID;
+                    archivedMessage.isOutgoing = YES;
+                    archivedMessage.messageStatus = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusCarbon;
+                }
                 
                 if (message.isGroupChatMessage) {
                     archivedMessage.userString = message.from.resource;
+                    
+                    if (isCarbonMessage) {
+                        archivedMessage.userString = [xmppStream.myJID user];
+                        archivedMessage.bareJid = message.to.bareJID;
+                    }
                 }
+                
                 
                 XMPPLogVerbose(@"New archivedMessage: %@", archivedMessage);
                                                              
@@ -488,12 +502,19 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 			if ([messageBody length] > 0)
 			{
 				BOOL didCreateNewContact = NO;
+                XMPPMessageArchiving_Contact_CoreDataObject *contact;
+                
+                //  The first time I receive a carbon message, the contact will be nil and then I've to create below.
+                //  once has been created, it will be able to show messages in the contacts' list.
+                if (isCarbonMessage) {
+                    contact = [self contactWithJid:message.to streamJid:nil managedObjectContext:[self managedObjectContext]];
+                } else {
+                    contact = [self contactForMessage:archivedMessage];
+                }
 				
-				XMPPMessageArchiving_Contact_CoreDataObject *contact = [self contactForMessage:archivedMessage];
 				XMPPLogVerbose(@"Previous contact: %@", contact);
 				
-				if (contact == nil)
-				{
+				if (contact == nil) {
 					contact = (XMPPMessageArchiving_Contact_CoreDataObject *)
 					    [[NSManagedObject alloc] initWithEntity:[self contactEntity:moc]
 					             insertIntoManagedObjectContext:nil];
@@ -501,18 +522,12 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 					didCreateNewContact = YES;
 				}
 				
-				contact.streamBareJidStr = archivedMessage.streamBareJidStr;
-				contact.bareJid = archivedMessage.bareJid;
-					
+                contact.bareJid = (isCarbonMessage) ? message.to : archivedMessage.bareJid;
+                contact.streamBareJidStr = archivedMessage.streamBareJidStr;
 				contact.mostRecentMessageTimestamp = archivedMessage.remoteTimestamp;
 				contact.mostRecentMessageBody = archivedMessage.body;
 				contact.mostRecentMessageOutgoing = @(isOutgoing);
-                
-                if (!isOutgoing) {
-                    contact.badgeUnreadMessages += 1;
-                } else {
-                    contact.badgeUnreadMessages = 0;
-                }
+                contact.badgeUnreadMessages = (isOutgoing) ? 0 : contact.badgeUnreadMessages + 1;
                 
 				XMPPLogVerbose(@"New contact: %@", contact);
 				

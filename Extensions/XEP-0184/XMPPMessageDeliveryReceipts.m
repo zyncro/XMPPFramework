@@ -125,8 +125,11 @@
     {        
         if(self.autoSendMessageDeliveryReceipts)
         {
-            XMPPMessage *generatedReceiptResponse = [message generateReceiptResponse];
-            [sender sendElement:generatedReceiptResponse];
+            //  MUST NOT send a receipt response if Carbon Message has been received.
+            if (![ [[message from] bare] isEqualToString:[[xmppStream myJID] bare]]) {
+                XMPPMessage *generatedReceiptResponse = [message generateReceiptResponse];
+                [sender sendElement:generatedReceiptResponse];
+            }
         }
     }
 }

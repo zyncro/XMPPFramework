@@ -37,7 +37,7 @@
 	
 	NSXMLElement *message = [NSXMLElement elementWithName:@"message"];
 	
-	NSString *to = [self fromStr];
+    NSString *to = [self from].bare;
 	if (to)
 	{
 		[message addAttributeWithName:@"to" stringValue:to];
