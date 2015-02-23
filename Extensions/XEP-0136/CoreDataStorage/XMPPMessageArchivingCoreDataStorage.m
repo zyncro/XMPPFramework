@@ -435,6 +435,14 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 				didCreateNewArchivedMessage = YES;
 			}
             
+            //  If has been received a duplicate message 1-1 conversation
+            if (!message.isGroupChatMessage && !isOutgoing) {
+                if ([self archivedMessageWithMessageId:message.elementID inManagedObjectContext:moc]) {
+                    NSLog(@"Duplicated Message.");
+                    return;
+                }
+            }
+
             XMPPJID *messageJid = isOutgoing ? [message to] : [message from];
             
             if (didCreateNewArchivedMessage) {
@@ -456,9 +464,9 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 archivedMessage.thread = [[message elementForName:@"thread"] stringValue];
                 archivedMessage.isOutgoing = isOutgoing;
                 archivedMessage.isComposing = isComposing;
+                archivedMessage.messageId = [[message attributeForName:@"id"] stringValue];
                 
                 if (isOutgoing && !isComposing) {
-                    archivedMessage.messageId = [[message attributeForName:@"id"] stringValue];
                     archivedMessage.messageStatus = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent;
                 }
             
@@ -466,7 +474,6 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 if (isCarbonMessage) {
                     archivedMessage.bareJid = message.to.bareJID;
                     archivedMessage.isOutgoing = YES;
-                    archivedMessage.messageStatus = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusCarbon;
                 }
                 
                 if (message.isGroupChatMessage) {
