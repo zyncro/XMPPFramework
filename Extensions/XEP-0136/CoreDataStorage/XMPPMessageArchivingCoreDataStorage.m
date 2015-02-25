@@ -545,6 +545,14 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 					[contact willInsertObject];       // Override hook
 					[self willInsertContact:contact]; // Override hook
 					[moc insertObject:contact];
+                    
+                    //  Delegate
+                    if (_delegate
+                        && [_delegate conformsToProtocol:@protocol(XMPPMessageArchivingCoreDataStorageDelegate)]
+                        && [_delegate respondsToSelector:@selector(xmppMessageArchivingCoreDataStorage: didCreateUser:)]) {
+                        
+                        [_delegate xmppMessageArchivingCoreDataStorage:self didCreateUser:contact];
+                    }
 				}
 				else
 				{

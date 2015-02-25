@@ -4,7 +4,14 @@
 #import "XMPPMessageArchiving.h"
 #import "XMPPMessageArchiving_Message_CoreDataObject.h"
 #import "XMPPMessageArchiving_Contact_CoreDataObject.h"
+@class XMPPMessageArchivingCoreDataStorage;
 
+@protocol XMPPMessageArchivingCoreDataStorageDelegate <NSObject>
+
+@optional
+- (void)xmppMessageArchivingCoreDataStorage:(XMPPMessageArchivingCoreDataStorage *)xmppMessageArchivingCoreDataStorage didCreateUser:(XMPPMessageArchiving_Contact_CoreDataObject *)contact;
+
+@end
 
 @interface XMPPMessageArchivingCoreDataStorage : XMPPCoreDataStorage <XMPPMessageArchivingStorage>
 {
@@ -31,7 +38,8 @@
 **/
 + (instancetype)sharedInstance;
 
-
+//  Delegate
+@property (nonatomic, weak) id<XMPPMessageArchivingCoreDataStorageDelegate> delegate;
 @property (strong) NSString *messageEntityName;
 @property (strong) NSString *contactEntityName;
 
