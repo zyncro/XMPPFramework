@@ -506,6 +506,16 @@
         ]
       },
       "prefix_header_contents": "#define HAVE_XMPP_SUBSPEC_XEP_0335"
+    },
+    {
+      "name": "ZyncroTech",
+      "source_files": "Extensions/ZyncroTech/**/*.{h,m}",
+      "dependencies": {
+        "XMPPFramework/Core": [
+
+        ]
+      },
+      "prefix_header_contents": "#define HAVE_XMPP_SUBSPEC_ZYNCROTECH"
     }
   ]
 }
