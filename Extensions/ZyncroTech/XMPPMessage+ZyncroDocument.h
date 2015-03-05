@@ -10,10 +10,12 @@
 
 @interface XMPPMessage (ZyncroDocument)
 
-- (void)addDocumentId:(NSString *)documentId;
+- (void)addDocumentId:(NSString *)documentId withGroupId:(NSString *)documentGroupId;
 
 - (NSString *)documentId;
+- (NSString *)documentGroupId;
 
 - (BOOL)hasDocumentId;
+- (BOOL)hasDocumentGroupId;
 
 @end

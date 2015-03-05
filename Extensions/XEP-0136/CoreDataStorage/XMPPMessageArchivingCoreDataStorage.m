@@ -4,7 +4,7 @@
 #import "NSXMLElement+XEP_0203.h"
 #import "XMPPMessage+XEP_0085.h"
 #import "XMPPMessage+XEP0045.h"
-#import "XMPPMessage+ZyncroDocument.h" // Add <document id="xxx" /> element to XMPPMessage
+#import "XMPPMessage+ZyncroDocument.h" // Add <document id="xxx" groupId="zzz" /> element to XMPPMessage
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -489,6 +489,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 // Message with ZLink/Document ID
                 if (message.hasDocumentId) {
                     archivedMessage.documentId      = message.documentId;
+                    archivedMessage.documentGroupId = message.documentGroupId;
                     archivedMessage.messageStatus   = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusToDownload;
                 }
                 

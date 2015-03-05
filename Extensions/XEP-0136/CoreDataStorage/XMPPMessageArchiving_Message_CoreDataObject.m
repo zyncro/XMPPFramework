@@ -27,6 +27,7 @@
 @dynamic messageStatus;
 @dynamic messageId;
 @dynamic documentId;
+@dynamic documentGroupId;
 @dynamic uploadDownloadTaskId;
 @dynamic userString;
 
