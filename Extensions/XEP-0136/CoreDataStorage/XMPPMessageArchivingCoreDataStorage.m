@@ -4,6 +4,7 @@
 #import "NSXMLElement+XEP_0203.h"
 #import "XMPPMessage+XEP_0085.h"
 #import "XMPPMessage+XEP0045.h"
+#import "XMPPMessage+ZyncroDocument.h" // Add <document id="xxx" /> element to XMPPMessage
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -360,7 +361,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 	NSString *messageBody = [[message elementForName:@"body"] stringValue];
 	BOOL isComposing = NO;
 	BOOL shouldDeleteComposingMessage = NO;
-    BOOL isCarbonMessage = ([message.from.bare isEqualToString:[xmppStream myJID].bare] && !isOutgoing) ? YES : NO;
+    BOOL isCarbonMessage = ([message.from.bare isEqualToString:[xmppStream myJID].bare] && !isOutgoing)? YES : NO;
 	
 	if ([messageBody length] == 0)
 	{
@@ -387,7 +388,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
     }
     
 	[self scheduleBlock:^{
-        if ([messageBody length] == 0) {
+        if (messageBody.length == 0) {
             return; // Do NOT insert in DB
         }
         
@@ -443,7 +444,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 }
             }
 
-            XMPPJID *messageJid = isOutgoing ? [message to] : [message from];
+            XMPPJID *messageJid = (isOutgoing)? message.to : message.from;
             
             if (didCreateNewArchivedMessage) {
                 archivedMessage.message = message;
@@ -480,11 +481,16 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                     archivedMessage.userString = message.from.resource;
                     
                     if (isCarbonMessage) {
-                        archivedMessage.userString = [xmppStream.myJID user];
-                        archivedMessage.bareJid = message.to.bareJID;
+                        archivedMessage.userString  = [xmppStream.myJID user];
+                        archivedMessage.bareJid     = message.to.bareJID;
                     }
                 }
                 
+                // Message with ZLink/Document ID
+                if (message.hasDocumentId) {
+                    archivedMessage.documentId      = message.documentId;
+                    archivedMessage.messageStatus   = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusToDownload;
+                }
                 
                 XMPPLogVerbose(@"New archivedMessage: %@", archivedMessage);
                                                              
@@ -546,11 +552,10 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 					[self willInsertContact:contact]; // Override hook
 					[moc insertObject:contact];
                     
-                    //  Delegate
+                    //  Notify delegate
                     if (_delegate
                         && [_delegate conformsToProtocol:@protocol(XMPPMessageArchivingCoreDataStorageDelegate)]
-                        && [_delegate respondsToSelector:@selector(xmppMessageArchivingCoreDataStorage: didCreateUser:)]) {
-                        
+                        && [_delegate respondsToSelector:@selector(xmppMessageArchivingCoreDataStorage:didCreateUser:)]) {
                         [_delegate xmppMessageArchivingCoreDataStorage:self didCreateUser:contact];
                     }
 				}

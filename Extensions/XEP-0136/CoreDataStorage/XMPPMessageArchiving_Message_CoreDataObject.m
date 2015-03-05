@@ -26,6 +26,8 @@
 @dynamic streamBareJidStr;
 @dynamic messageStatus;
 @dynamic messageId;
+@dynamic documentId;
+@dynamic uploadDownloadTaskId;
 @dynamic userString;
 
 #pragma mark Transient message

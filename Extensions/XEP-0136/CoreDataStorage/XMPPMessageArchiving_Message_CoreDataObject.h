@@ -7,6 +7,11 @@ typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageStatu
     XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent    = 1,
     XMPPMessageArchiving_Message_CoreDataObjectMessageStatusReceived = 2,
     XMPPMessageArchiving_Message_CoreDataObjectMessageStatusFailed = 3,
+    
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusUploading = 4,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusToDownload = 5,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusDownloading = 6,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusDownloaded = 7,
 };
 
 @interface XMPPMessageArchiving_Message_CoreDataObject : NSManagedObject
@@ -40,6 +45,9 @@ typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageStatu
 
 @property (strong, nonatomic) NSString *messageId;
 @property (assign, nonatomic) XMPPMessageArchiving_Message_CoreDataObjectMessageStatus messageStatus;
+
+@property (strong, nonatomic) NSString *documentId; // Attachment in messages
+@property (strong, nonatomic) NSString *uploadDownloadTaskId; // Attachment upload/download task
 
 @property (strong, nonatomic) NSString *userString;
 
