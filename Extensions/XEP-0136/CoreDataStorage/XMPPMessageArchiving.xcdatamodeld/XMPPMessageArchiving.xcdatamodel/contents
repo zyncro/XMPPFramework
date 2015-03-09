@@ -19,7 +19,7 @@
         <attribute name="localTimestamp" attributeType="Date" indexed="YES" syncable="YES"/>
         <attribute name="message" optional="YES" transient="YES" syncable="YES"/>
         <attribute name="messageId" optional="YES" attributeType="String" indexed="YES" syncable="YES"/>
-        <attribute name="messageStatus" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="4" defaultValueString="0" syncable="YES"/>
+        <attribute name="messageStatus" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="7" defaultValueString="0" syncable="YES"/>
         <attribute name="messageStr" attributeType="String" defaultValueString="0" syncable="YES"/>
         <attribute name="outgoing" attributeType="Boolean" defaultValueString="NO" indexed="YES" syncable="YES"/>
         <attribute name="remoteTimestamp" optional="YES" attributeType="Date" indexed="YES" syncable="YES"/>
