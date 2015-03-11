@@ -5,6 +5,7 @@
 #import "XMPPMessage+XEP_0085.h"
 #import "XMPPMessage+XEP0045.h"
 #import "XMPPMessage+ZyncroDocument.h" // Add <document id="xxx" groupId="zzz" /> element to XMPPMessage
+#import "XMPPMessage+ZyncroRoom.h"     // Add <roommessage id="xxx"></roomMessageId> element to XMPPMessage
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -434,15 +435,14 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 				             insertIntoManagedObjectContext:nil];
 				
 				didCreateNewArchivedMessage = YES;
-			}
-            
-            //  If has been received a duplicate message 1-1 conversation
-            if (!message.isGroupChatMessage && !isOutgoing) {
-                if ([self archivedMessageWithMessageId:message.elementID inManagedObjectContext:moc]) {
-                    NSLog(@"Duplicated Message.");
+                
+                //  Filter duplicated messages, special case in group with a new element called "roommessage" with an "id" attribute to storage the message Id.
+                NSString *messageId = (message.isGroupChatMessage && message.hasElementRoomID) ? message.elementRoomID : message.elementID;
+                if ([self archivedMessageWithMessageId:messageId inManagedObjectContext:moc]) {
+                    NSLog(@"Duplicated message.");
                     return;
                 }
-            }
+			}
 
             XMPPJID *messageJid = (isOutgoing)? message.to : message.from;
             
@@ -465,8 +465,9 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 archivedMessage.thread = [[message elementForName:@"thread"] stringValue];
                 archivedMessage.isOutgoing = isOutgoing;
                 archivedMessage.isComposing = isComposing;
-                archivedMessage.messageId = [[message attributeForName:@"id"] stringValue];
                 
+                archivedMessage.messageId = (message.isGroupChatMessage && message.hasElementRoomID) ? message.elementRoomID : message.elementID;
+                                
                 if (isOutgoing && !isComposing) {
                     archivedMessage.messageStatus = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent;
                 }
