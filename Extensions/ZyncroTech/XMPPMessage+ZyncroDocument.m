@@ -37,14 +37,19 @@ static NSString *const ZMXMLNSZyncroMessenger       = @"http://www.zyncro.com/me
     [self addChild:document];
 }
 
+- (NSXMLElement *)documentElement {
+    NSXMLElement *document = [self elementForName:ZMNameDocument xmlns:ZMXMLNSZyncroMessenger];
+    return document;
+}
+
 - (NSString *)documentId {
-    NSXMLElement *document  = [self elementForName:ZMNameDocument xmlns:ZMXMLNSZyncroMessenger];
+    NSXMLElement *document  = [self documentElement];
     NSString *documentId    = [document attributeStringValueForName:ZMAttributeDocumentId];
     return documentId;
 }
 
 - (NSString *)documentGroupId {
-    NSXMLElement *document      = [self elementForName:ZMNameDocument xmlns:ZMXMLNSZyncroMessenger];
+    NSXMLElement *document      = [self documentElement];
     NSString *documentGroupId   = [document attributeStringValueForName:ZMAttributeDocumentGroupId];
     return documentGroupId;
 }
