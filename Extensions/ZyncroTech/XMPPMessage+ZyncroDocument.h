@@ -12,6 +12,8 @@
 
 - (void)addDocumentId:(NSString *)documentId withGroupId:(NSString *)documentGroupId;
 
+- (NSXMLElement *)documentElement;
+
 - (NSString *)documentId;
 - (NSString *)documentGroupId;
 

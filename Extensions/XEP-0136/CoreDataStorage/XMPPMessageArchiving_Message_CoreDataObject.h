@@ -3,15 +3,24 @@
 #import "XMPP.h"
 
 typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageStatus) {
-    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusPending = 0,
-    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent    = 1,
-    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusReceived = 2,
-    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusFailed = 3,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusPending     = 0,    // Message pending to be sent
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent        = 1,    // Message already sent to the server
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusReceived    = 2,    // Message received by destination user
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusFailed      = 3,    // Message failed to send
     
-    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusUploading = 4,
-    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusToDownload = 5,
-    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusDownloading = 6,
-    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusDownloaded = 7,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusToUpload    = 4,    // Preparing for upload
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusUploading   = 5,    // Upload in progress
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusUploaded    = 6,    // Successfully uploaded but XMPP message not sent yet
+    
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusToDownload  = 7,    // Initial state for incoming messages from others with attachments
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusDownloading = 8,    // Download in progress
+    XMPPMessageArchiving_Message_CoreDataObjectMessageStatusDownloaded  = 9,    // Already downloaded to disk
+    
+    /**
+     * Please note that the Core Data model entity for object does validate if the 'messageStatus'
+     * property is within range of valid values. If you include new values to this enum,
+     * remember to update validation fields in Core Data model
+    **/
 };
 
 @interface XMPPMessageArchiving_Message_CoreDataObject : NSManagedObject
@@ -46,9 +55,9 @@ typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageStatu
 @property (strong, nonatomic) NSString *messageId;
 @property (assign, nonatomic) XMPPMessageArchiving_Message_CoreDataObjectMessageStatus messageStatus;
 
-@property (strong, nonatomic) NSString *documentId; // Attachment in messages
-@property (strong, nonatomic) NSString *documentGroupId; // Attachment's parent group in messages
-@property (strong, nonatomic) NSString *uploadDownloadTaskId; // Attachment upload/download task
+@property (strong, nonatomic) NSString *documentId;             // Attachment in messages
+@property (strong, nonatomic) NSString *documentGroupId;        // Attachment's parent group in messages
+@property (strong, nonatomic) NSString *uploadDownloadTaskId;   // Attachment local upload/download task ID to track network progress
 
 @property (strong, nonatomic) NSString *userString;
 
