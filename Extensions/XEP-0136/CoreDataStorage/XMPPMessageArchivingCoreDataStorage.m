@@ -217,6 +217,20 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
     return message;
 }
 
+- (XMPPMessageArchiving_Message_CoreDataObjectMessageType)messageTypeForNotificationType:(NSString *)notificationType {
+    XMPPMessageArchiving_Message_CoreDataObjectMessageType messageType;
+    if ([notificationType isEqualToString:@"user-joined"]) {
+        messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserJoined;
+    } else if ([notificationType isEqualToString:@"user-left"]) {
+        messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserLeft;
+    } else if ([notificationType isEqualToString:@"user-banned"]) {
+        messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserBanned;
+    } else {
+        messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeDefault;
+    }
+    return messageType;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Public API
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -451,9 +465,11 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 archivedMessage.message = message;
                 
                 if (message.hasNotification) {
-                        archivedMessage.body = [message notificationMessage];
+                    archivedMessage.body = nil;
+                    archivedMessage.type = [self messageTypeForNotificationType:message.notificationType];
                 } else {
                     archivedMessage.body = messageBody;
+                    archivedMessage.type = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeDefault;
                 }
                 
                 
@@ -473,7 +489,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 archivedMessage.isOutgoing = isOutgoing;
                 archivedMessage.isComposing = isComposing;
                 
-                archivedMessage.messageId = (message.isGroupChatMessage && message.hasElementRoomID) ? message.elementRoomID : message.elementID;
+                archivedMessage.messageId = (message.isGroupChatMessage && message.hasElementRoomID)? message.elementRoomID : message.elementID;
                                 
                 if (isOutgoing && !isComposing) {
                     archivedMessage.messageStatus = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent;
@@ -486,7 +502,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 }
                 
                 if (message.isGroupChatMessage) {
-                    archivedMessage.userString = (message.from.resource) ? message.from.resource : @"Room";
+                    archivedMessage.userString = (message.from.resource)? : message.notificationUser;
                     
                     if (isCarbonMessage) {
                         archivedMessage.userString  = [xmppStream.myJID user];
@@ -496,6 +512,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 
                 // Message with ZLink/Document ID
                 if (message.hasDocumentId) {
+                    archivedMessage.type            = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeAttachment;
                     archivedMessage.documentId      = message.documentId;
                     archivedMessage.documentGroupId = message.documentGroupId;
                     archivedMessage.messageStatus   = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusToDownload;

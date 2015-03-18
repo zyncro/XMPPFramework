@@ -9,10 +9,11 @@
 #import "XMPPMessage+ZyncroRoomNotification.h"
 #import "NSXMLElement+XMPP.h"
 
-static NSString *const ZMExtension               = @"x";
-static NSString *const ZMNameElement               = @"notification";
-static NSString *const ZMAttributeMessageId        = @"code";
-//static NSString *const ZMXMLNSZyncroMessenger       = @"http://www.zyncro.com/messenger";
+static NSString *const ZMNameExtension              = @"x";
+static NSString *const ZMNameNotification           = @"notification";
+static NSString *const ZMAttributeNotificationType  = @"type";
+static NSString *const ZMAttributeNotificationJID   = @"jid";
+static NSString *const ZMXMLNSZyncroMessenger       = @"http://www.zyncro.com/messenger";
 
 @implementation XMPPMessage (ZyncroRoomNotification)
 
@@ -21,32 +22,46 @@ static NSString *const ZMAttributeMessageId        = @"code";
  *      ...
  *      <body>XXX</body>
  *      <x xmlns="http://www.zyncro.com/messenger">
- *      <roommessage id="XXX" />
- *      <notification code="XXX"/>
- *      ...
+ *          <notification type="XXX" jid="YYY" />
  *      </x>
  *      ...
  * </message>
  */
 
-- (NSString *)notificationCode {
-    NSXMLElement *x = [self elementForName:ZMExtension];
-    NSXMLElement *notification  = [x elementForName:ZMNameElement];
-    NSString *code    = [notification attributeStringValueForName:ZMAttributeMessageId];
-    return code;
+- (NSXMLElement *)extensionElement {
+    NSXMLElement *x = [self elementForName:ZMNameExtension xmlns:ZMXMLNSZyncroMessenger];
+    return x;
+}
+
+- (NSString *)notificationType {
+    NSXMLElement *x = [self extensionElement];
+    NSXMLElement *notification  = [x elementForName:ZMNameNotification];
+    NSString *type    = [notification attributeStringValueForName:ZMAttributeNotificationType];
+    return type;
+}
+
+- (NSString *)notificationUser {
+    NSXMLElement *x = [self extensionElement];
+    NSXMLElement *notification  = [x elementForName:ZMNameNotification];
+    NSString *jid    = [notification attributeStringValueForName:ZMAttributeNotificationJID];
+    return [XMPPJID jidWithString:jid].user;
 }
 
 - (BOOL)hasNotification {
-    NSString *code = [self notificationCode];
+    NSString *code = [self notificationType];
     return (code && code.length > 0);
 }
 
-- (NSString *)notificationMessage {
-    NSString *message = nil;
-    if ([[self notificationCode] isEqualToString:@"307"]) {
-        message = @"Message from room.";
-    }
-    return message;
-}
+//- (NSString *)notificationMessage {
+//    NSString *message = nil;
+//    if ([[self notificationType] isEqualToString:@"user-joined"]) {
+//        message = @"User joined.";
+//    } else if ([[self notificationType] isEqualToString:@"user-banned"]) {
+//        message = @"User left the room.";
+//    } else {
+//        message = @"User left the room.";
+//    }
+//    return message;
+//}
 
 @end

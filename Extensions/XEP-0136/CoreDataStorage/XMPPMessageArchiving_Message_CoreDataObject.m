@@ -30,6 +30,7 @@
 @dynamic documentGroupId;
 @dynamic uploadDownloadTaskId;
 @dynamic userString;
+@dynamic type;
 
 #pragma mark Transient message
 

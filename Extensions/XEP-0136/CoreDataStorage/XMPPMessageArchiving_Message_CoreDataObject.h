@@ -23,6 +23,23 @@ typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageStatu
     **/
 };
 
+typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageType) {
+    XMPPMessageArchiving_Message_CoreDataObjectMessageTypeDefault           = 0,
+    
+    XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserJoined    = 1,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserLeft      = 2,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserBanned    = 3,
+    
+    XMPPMessageArchiving_Message_CoreDataObjectMessageTypeAttachment        = 4,
+    
+    /**
+     * Please note that the Core Data model entity for object does validate if the 'type'
+     * property is within range of valid values. If you include new values to this enum,
+     * remember to update validation fields in Core Data model
+     **/
+};
+
+
 @interface XMPPMessageArchiving_Message_CoreDataObject : NSManagedObject
 
 @property (nonatomic, strong) XMPPMessage * message;  // Transient (proper type, not on disk)
@@ -60,6 +77,7 @@ typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageStatu
 @property (strong, nonatomic) NSString *uploadDownloadTaskId;   // Attachment local upload/download task ID to track network progress
 
 @property (strong, nonatomic) NSString *userString;
+@property (assign, nonatomic) XMPPMessageArchiving_Message_CoreDataObjectMessageType type;
 
 /**
  * This method is called immediately before the object is inserted into the managedObjectContext.
