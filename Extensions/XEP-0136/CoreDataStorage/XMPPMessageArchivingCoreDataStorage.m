@@ -6,6 +6,7 @@
 #import "XMPPMessage+XEP0045.h"
 #import "XMPPMessage+ZyncroDocument.h" // Add <document id="xxx" groupId="zzz" /> element to XMPPMessage
 #import "XMPPMessage+ZyncroRoom.h"     // Add <roommessage id="xxx"></roomMessageId> element to XMPPMessage
+#import "XMPPMessage+ZyncroRoomNotification.h"
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -359,12 +360,12 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 {
 	// Message should either have a body, or be a composing notification
 	
-	NSString *messageBody = [[message elementForName:@"body"] stringValue];
-	BOOL isComposing = NO;
+	NSString *messageBody = message.body;
+    BOOL isComposing = NO;
 	BOOL shouldDeleteComposingMessage = NO;
     BOOL isCarbonMessage = ([message.from.bare isEqualToString:[xmppStream myJID].bare] && !isOutgoing)? YES : NO;
 	
-	if ([messageBody length] == 0)
+	if ([messageBody length] == 0 && !message.hasNotification)
 	{
 		// Message doesn't have a body.
 		// Check to see if it has a chat state (composing, paused, etc).
@@ -389,7 +390,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
     }
     
 	[self scheduleBlock:^{
-        if (messageBody.length == 0) {
+        if (messageBody.length == 0 && !message.hasNotification) {
             return; // Do NOT insert in DB
         }
         
@@ -405,7 +406,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
         }
         
         XMPPJID *myJid = [self myJIDForXMPPStream:xmppStream];
-        if (!isOutgoing && message.body.length > 0 && [message.from.resource isEqualToString:myJid.user]) {
+        if (!isOutgoing && message.body.length > 0 && [message.from.resource isEqualToString:myJid.user] && !message.hasNotification) {
             // If the message was sent by me (group echo), do NOT insert it in the DB.
             return;
         }
@@ -448,7 +449,13 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
             
             if (didCreateNewArchivedMessage) {
                 archivedMessage.message = message;
-                archivedMessage.body = messageBody;
+                
+                if (message.hasNotification) {
+                        archivedMessage.body = [message notificationMessage];
+                } else {
+                    archivedMessage.body = messageBody;
+                }
+                
                 
                 archivedMessage.bareJid = [messageJid bareJID];
                 archivedMessage.streamBareJidStr = [myJid bare];
@@ -462,7 +469,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 else
                     archivedMessage.remoteTimestamp = archivedMessage.localTimestamp;
                 
-                archivedMessage.thread = [[message elementForName:@"thread"] stringValue];
+                archivedMessage.thread = message.thread;
                 archivedMessage.isOutgoing = isOutgoing;
                 archivedMessage.isComposing = isComposing;
                 
@@ -479,7 +486,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 }
                 
                 if (message.isGroupChatMessage) {
-                    archivedMessage.userString = message.from.resource;
+                    archivedMessage.userString = (message.from.resource) ? message.from.resource : @"Room";
                     
                     if (isCarbonMessage) {
                         archivedMessage.userString  = [xmppStream.myJID user];

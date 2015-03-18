@@ -307,6 +307,44 @@ enum XMPPRoomState
 		dispatch_async(moduleQueue, block);
 }
 
+
+- (void)createRoom:(NSString *)desiredNickname
+{
+    dispatch_block_t block = ^{ @autoreleasepool {
+        
+        XMPPLogTrace2(@"%@[%@] - %@", THIS_FILE, roomJID, THIS_METHOD);
+        
+        // Check state and update variables
+        
+        if (![self preJoinWithNickname:desiredNickname])
+        {
+            return;
+        }
+        
+        // <presence to='darkcave@chat.shakespeare.lit/firstwitch'>
+        //   <x xmlns='http://jabber.org/protocol/muc'/>
+        //     <create>true</create>
+        //   </x>
+        // </presence>
+        
+        NSXMLElement *x = [NSXMLElement elementWithName:@"x" xmlns:@"http://jabber.org/protocol/muc"];
+        [x addChild:[NSXMLElement elementWithName:@"create" stringValue:@"true"]];
+        
+        XMPPPresence *presence = [XMPPPresence presenceWithType:nil to:myRoomJID];
+        [presence addChild:x];
+        
+        [xmppStream sendElement:presence];
+        
+        state |= kXMPPRoomStateJoining;
+        
+    }};
+    
+    if (dispatch_get_specific(moduleQueueTag))
+        block();
+    else
+        dispatch_async(moduleQueue, block);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma mark Room Configuration
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

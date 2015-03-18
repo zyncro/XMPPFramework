@@ -9,6 +9,7 @@
 #import "XMPPMessage+ZyncroRoom.h"
 #import "NSXMLElement+XMPP.h"
 
+static NSString *const ZMExtension               = @"x";
 static NSString *const ZMNameElement               = @"roommessage";
 static NSString *const ZMAttributeMessageId        = @"id";
 static NSString *const ZMXMLNSZyncroMessenger       = @"http://www.zyncro.com/messenger";
@@ -23,19 +24,25 @@ static NSString *const ZMXMLNSZyncroMessenger       = @"http://www.zyncro.com/me
      * <message>
      *      ...
      *      <body>XXX</body>
+     *      <x xmlns="http://www.zyncro.com/messenger">
+     *      <roommessage id="XXX" />
      *      ...
-     *      <rommmessage xmlns="http://www.zyncro.com/messenger" id="XXX" />
+     *      </x>
      *      ...
      * </message>
      */
-    NSXMLElement *roommessage = [NSXMLElement elementWithName:ZMNameElement xmlns:ZMXMLNSZyncroMessenger];
+    NSXMLElement *x = [NSXMLElement elementWithName:ZMExtension xmlns:ZMXMLNSZyncroMessenger];
+    NSXMLElement *roommessage = [NSXMLElement elementWithName:ZMNameElement];
     [roommessage addAttributeWithName:ZMAttributeMessageId        stringValue:roomMessageId];
     
-    [self addChild:roommessage];
+    [x addChild:roommessage];
+    
+    [self addChild:x];
 }
 
 - (NSString *)elementRoomID {
-    NSXMLElement *roomMessage  = [self elementForName:ZMNameElement xmlns:ZMXMLNSZyncroMessenger];
+    NSXMLElement *x = [self elementForName:ZMExtension];
+    NSXMLElement *roomMessage  = [x elementForName:ZMNameElement];
     NSString *roomMessageId    = [roomMessage attributeStringValueForName:ZMAttributeMessageId];
     return roomMessageId;
 }

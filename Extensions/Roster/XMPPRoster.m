@@ -732,10 +732,10 @@ enum XMPPRosterFlags
 		
 		if (!hasRoster)
 		{
-            [xmppRosterStorage clearAllUsersAndResourcesForXMPPStream:xmppStream];
+            //[xmppRosterStorage clearAllUsersAndResourcesForXMPPStream:xmppStream];
             [self _setPopulatingRoster:YES];
             [multicastDelegate xmppRosterDidBeginPopulating:self];
-			[xmppRosterStorage beginRosterPopulationForXMPPStream:xmppStream];
+			//[xmppRosterStorage beginRosterPopulationForXMPPStream:xmppStream];
 		}
 		
 		NSArray *items = [query elementsForName:@"item"];
@@ -926,11 +926,11 @@ enum XMPPRosterFlags
 	
     if([self autoClearAllUsersAndResources])
     {
-        [xmppRosterStorage clearAllUsersAndResourcesForXMPPStream:xmppStream];
+        //[xmppRosterStorage clearAllUsersAndResourcesForXMPPStream:xmppStream];
     }
     else
     {
-        [xmppRosterStorage clearAllResourcesForXMPPStream:xmppStream];
+        //[xmppRosterStorage clearAllResourcesForXMPPStream:xmppStream];
     }
 	
 	[self _setRequestedRoster:NO];
