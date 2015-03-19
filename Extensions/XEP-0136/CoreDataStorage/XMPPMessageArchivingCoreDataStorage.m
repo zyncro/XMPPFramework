@@ -225,6 +225,8 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
         messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserLeft;
     } else if ([notificationType isEqualToString:@"user-banned"]) {
         messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserBanned;
+    } else if ([notificationType isEqualToString:@"room-destroyed"]) {
+        messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomDestroyed;
     } else {
         messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeDefault;
     }

@@ -29,8 +29,9 @@ typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageType)
     XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserJoined    = 1,
     XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserLeft      = 2,
     XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserBanned    = 3,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomDestroyed     = 4,
     
-    XMPPMessageArchiving_Message_CoreDataObjectMessageTypeAttachment        = 4,
+    XMPPMessageArchiving_Message_CoreDataObjectMessageTypeAttachment        = 5,
     
     /**
      * Please note that the Core Data model entity for object does validate if the 'type'

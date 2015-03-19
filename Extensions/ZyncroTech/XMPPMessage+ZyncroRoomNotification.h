@@ -10,9 +10,10 @@
 
 @interface XMPPMessage (ZyncroRoomNotification)
 
+- (void)addNotificationType:(NSString *)notificationType toUser:(XMPPJID *)notificationUserJID;
+
 - (NSString *)notificationType;
 - (NSString *)notificationUser;
 - (BOOL)hasNotification;
-//- (NSString *)notificationMessage;
 
 @end

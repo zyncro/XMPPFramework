@@ -17,32 +17,59 @@ static NSString *const ZMXMLNSZyncroMessenger       = @"http://www.zyncro.com/me
 
 @implementation XMPPMessage (ZyncroRoomNotification)
 
-/**
- * <message>
- *      ...
- *      <body>XXX</body>
- *      <x xmlns="http://www.zyncro.com/messenger">
- *          <notification type="XXX" jid="YYY" />
- *      </x>
- *      ...
- * </message>
- */
+
+
+- (void)addNotificationType:(NSString *)notificationType toUser:(XMPPJID *)notificationUserJID {
+    if (!notificationType || notificationType.length == 0 || !notificationUserJID) {
+        return;
+    }
+    /**
+     * <message>
+     *      ...
+     *      <body>XXX</body>
+     *      <x xmlns="http://www.zyncro.com/messenger">
+     *          <notification type="XXX" jid="YYY" />
+     *      </x>
+     *      ...
+     * </message>
+     */
+    
+    NSXMLElement *x = [self extensionElement];
+    if (!x) {
+        x = [NSXMLElement elementWithName:ZMNameExtension xmlns:ZMXMLNSZyncroMessenger];
+        [self addChild:x];
+    }
+    
+    NSXMLElement *notification  = [x elementForName:ZMNameNotification];
+    if (notification) {
+        [notification detach];
+    }
+    notification = [NSXMLElement elementWithName:ZMNameNotification];
+    [notification addAttributeWithName:ZMAttributeNotificationType  stringValue:notificationType];
+    [notification addAttributeWithName:ZMAttributeNotificationJID   stringValue:notificationUserJID.bare];
+    
+    [x addChild:notification];
+}
 
 - (NSXMLElement *)extensionElement {
     NSXMLElement *x = [self elementForName:ZMNameExtension xmlns:ZMXMLNSZyncroMessenger];
     return x;
 }
 
-- (NSString *)notificationType {
+- (NSXMLElement *)notificationElement {
     NSXMLElement *x = [self extensionElement];
     NSXMLElement *notification  = [x elementForName:ZMNameNotification];
+    return notification;
+}
+
+- (NSString *)notificationType {
+    NSXMLElement *notification  = [self notificationElement];
     NSString *type    = [notification attributeStringValueForName:ZMAttributeNotificationType];
     return type;
 }
 
 - (NSString *)notificationUser {
-    NSXMLElement *x = [self extensionElement];
-    NSXMLElement *notification  = [x elementForName:ZMNameNotification];
+    NSXMLElement *notification  = [self notificationElement];
     NSString *jid    = [notification attributeStringValueForName:ZMAttributeNotificationJID];
     return [XMPPJID jidWithString:jid].user;
 }
@@ -52,16 +79,5 @@ static NSString *const ZMXMLNSZyncroMessenger       = @"http://www.zyncro.com/me
     return (code && code.length > 0);
 }
 
-//- (NSString *)notificationMessage {
-//    NSString *message = nil;
-//    if ([[self notificationType] isEqualToString:@"user-joined"]) {
-//        message = @"User joined.";
-//    } else if ([[self notificationType] isEqualToString:@"user-banned"]) {
-//        message = @"User left the room.";
-//    } else {
-//        message = @"User left the room.";
-//    }
-//    return message;
-//}
 
 @end
