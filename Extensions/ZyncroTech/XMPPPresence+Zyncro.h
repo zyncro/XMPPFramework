@@ -6,10 +6,15 @@
 //
 //
 
+#import <Foundation/Foundation.h>
 #import "XMPPPresence.h"
 
 @interface XMPPPresence (Zyncro)
 
 - (BOOL)isUnavailablePresence;
+- (BOOL)hasCode;
+- (BOOL)hasDestroyElement;
+
+- (NSString *)codeAttribute;
 
 @end

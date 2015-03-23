@@ -322,16 +322,20 @@ enum XMPPRoomState
         }
         
         // <presence to='darkcave@chat.shakespeare.lit/firstwitch'>
-        //   <x xmlns='http://jabber.org/protocol/muc'/>
-        //     <create>true</create>
+        //   <x xmlns='http://jabber.org/protocol/muc' />
+        //   </x>
+        //   <x xmlns='http://www.zyncro.com/messenger' />
+        //   <create-room/>
         //   </x>
         // </presence>
         
         NSXMLElement *x = [NSXMLElement elementWithName:@"x" xmlns:@"http://jabber.org/protocol/muc"];
-        [x addChild:[NSXMLElement elementWithName:@"create" stringValue:@"true"]];
+        NSXMLElement *zyncroExtension = [NSXMLElement elementWithName:@"x" xmlns:@"http://www.zyncro.com/messenger"];
+        [zyncroExtension addChild:[NSXMLElement elementWithName:@"create-room"]];
         
         XMPPPresence *presence = [XMPPPresence presenceWithType:nil to:myRoomJID];
         [presence addChild:x];
+        [presence addChild:zyncroExtension];
         
         [xmppStream sendElement:presence];
         
