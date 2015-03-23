@@ -14,6 +14,7 @@
 - (BOOL)isUnavailablePresence;
 - (BOOL)hasCode;
 - (BOOL)hasDestroyElement;
+- (BOOL)hasError;
 
 - (NSString *)codeAttribute;
 

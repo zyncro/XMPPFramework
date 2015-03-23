@@ -12,12 +12,15 @@
 static NSString *const ZMNameExtension  = @"x";
 static NSString *const ZMNameStatus     = @"status";
 static NSString *const ZMNameDestroy    = @"destroy";
+static NSString *const ZMNameError      = @"error";
 static NSString *const ZMAttributeCode  = @"code";
+static NSString *const ZMPresenceType   = @"unavailable";
+
 
 @implementation XMPPPresence (Zyncro)
 
 - (BOOL)isUnavailablePresence {
-    return [[self type] isEqualToString:@"unavailable"];
+    return [[self type] isEqualToString:ZMPresenceType];
 }
 
 - (NSXMLElement *)extensionElement {
@@ -30,8 +33,19 @@ static NSString *const ZMAttributeCode  = @"code";
     return status;
 }
 
+- (NSXMLElement *)errorElement {
+    NSXMLElement *error = [self elementForName:ZMNameError];
+    return error;
+}
+
+
 - (NSString *)codeAttribute {
-    NSString *code = [[[self statusElement] attributeForName:ZMAttributeCode] stringValue];
+    NSString *code = nil;
+    if ([self hasError]) {
+        code = [[[self errorElement] attributeForName:ZMAttributeCode] stringValue];
+    } else {
+        code = [[[self statusElement] attributeForName:ZMAttributeCode] stringValue];
+    }
     return code;
 }
 
@@ -53,6 +67,11 @@ static NSString *const ZMAttributeCode  = @"code";
 - (BOOL)hasCode {
     NSString *code = [self codeAttribute];
     return (code && code.length > 0);
+}
+
+- (BOOL)hasError {
+    NSArray *error = [self elementsForName:ZMNameError];
+    return (error.count > 0);
 }
 
 
