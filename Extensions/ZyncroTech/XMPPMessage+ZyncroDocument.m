@@ -7,16 +7,17 @@
 //
 
 #import "XMPPMessage+ZyncroDocument.h"
+#import "XMPPMessage+ZyncroExtension.h"
 #import "NSXMLElement+XMPP.h"
 
 static NSString *const ZMNameDocument               = @"document";
 static NSString *const ZMAttributeDocumentId        = @"id";
 static NSString *const ZMAttributeDocumentGroupId   = @"groupId";
-static NSString *const ZMXMLNSZyncroMessenger       = @"http://www.zyncro.com/messenger";
+static NSString *const ZMAttributeDocumentName      = @"name";
 
 @implementation XMPPMessage (ZyncroDocument)
 
-- (void)addDocumentId:(NSString *)documentId withGroupId:(NSString *)documentGroupId {
+- (void)addDocumentId:(NSString *)documentId groupId:(NSString *)documentGroupId andName:(NSString *)documentName {
     if (!documentId || documentId.length == 0
         || !documentGroupId || documentGroupId.length == 0) {
         return;
@@ -26,19 +27,29 @@ static NSString *const ZMXMLNSZyncroMessenger       = @"http://www.zyncro.com/me
      *      ...
      *      <body> __ZLink__ </body>
      *      ...
-     *      <document xmlns="http://www.zyncro.com/messenger" id="__documentUrn__" groupId="__groupUrn__" />
+     *      <x xmlns="http://www.zyncro.com/messenger">
+     *          ...
+     *          <document id="__documentUrn__" groupId="__groupUrn__" name="__documentName__" />
+     *          ...
+     *      </x>
      *      ...
      * </message>
      */
-    NSXMLElement *document = [NSXMLElement elementWithName:ZMNameDocument xmlns:ZMXMLNSZyncroMessenger];
+    NSXMLElement *document = [NSXMLElement elementWithName:ZMNameDocument];
     [document addAttributeWithName:ZMAttributeDocumentId        stringValue:documentId];
     [document addAttributeWithName:ZMAttributeDocumentGroupId   stringValue:documentGroupId];
+    [document addAttributeWithName:ZMAttributeDocumentName      stringValue:documentName];
     
-    [self addChild:document];
+    NSXMLElement *x = [self extensionElement];
+    if (!x) {
+        x = [self addExtension];
+    }
+    [x addChild:document];
 }
 
 - (NSXMLElement *)documentElement {
-    NSXMLElement *document = [self elementForName:ZMNameDocument xmlns:ZMXMLNSZyncroMessenger];
+    NSXMLElement *x         = [self extensionElement];
+    NSXMLElement *document  = [x elementForName:ZMNameDocument];
     return document;
 }
 
@@ -54,6 +65,12 @@ static NSString *const ZMXMLNSZyncroMessenger       = @"http://www.zyncro.com/me
     return documentGroupId;
 }
 
+- (NSString *)documentName {
+    NSXMLElement *document  = [self documentElement];
+    NSString *documentName  = [document attributeStringValueForName:ZMAttributeDocumentName];
+    return documentName;
+}
+
 - (BOOL)hasDocumentId {
     NSString *documentId = [self documentId];
     return (documentId && documentId.length > 0);
@@ -62,6 +79,11 @@ static NSString *const ZMXMLNSZyncroMessenger       = @"http://www.zyncro.com/me
 - (BOOL)hasDocumentGroupId {
     NSString *documentGroupId = [self documentGroupId];
     return (documentGroupId && documentGroupId.length > 0);
+}
+
+- (BOOL)hasDocumentName {
+    NSString *documentName = [self documentName];
+    return (documentName && documentName.length > 0);
 }
 
 @end

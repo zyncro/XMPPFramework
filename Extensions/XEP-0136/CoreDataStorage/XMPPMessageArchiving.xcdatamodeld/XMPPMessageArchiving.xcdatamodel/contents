@@ -16,6 +16,7 @@
         <attribute name="composing" attributeType="Boolean" defaultValueString="NO" indexed="YES" syncable="YES"/>
         <attribute name="documentGroupId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="documentId" optional="YES" attributeType="String" indexed="YES" syncable="YES"/>
+        <attribute name="documentPath" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="localTimestamp" attributeType="Date" indexed="YES" syncable="YES"/>
         <attribute name="message" optional="YES" transient="YES" syncable="YES"/>
         <attribute name="messageId" optional="YES" attributeType="String" indexed="YES" syncable="YES"/>
@@ -31,6 +32,6 @@
     </entity>
     <elements>
         <element name="XMPPMessageArchiving_Contact_CoreDataObject" positionX="-182" positionY="198" width="128" height="148"/>
-        <element name="XMPPMessageArchiving_Message_CoreDataObject" positionX="160" positionY="192" width="128" height="315"/>
+        <element name="XMPPMessageArchiving_Message_CoreDataObject" positionX="160" positionY="192" width="128" height="330"/>
     </elements>
 </model>

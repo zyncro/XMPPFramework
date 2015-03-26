@@ -454,7 +454,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 				didCreateNewArchivedMessage = YES;
                 
                 //  Filter duplicated messages, special case in group with a new element called "roommessage" with an "id" attribute to storage the message Id.
-                NSString *messageId = (message.isGroupChatMessage && message.hasElementRoomID) ? message.elementRoomID : message.elementID;
+                NSString *messageId = (message.isGroupChatMessage && message.hasRoomMessageId)? message.roomMessageId : message.elementID;
                 if ([self archivedMessageWithMessageId:messageId inManagedObjectContext:moc]) {
                     NSLog(@"Duplicated message.");
                     return;
@@ -491,7 +491,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 archivedMessage.isOutgoing = isOutgoing;
                 archivedMessage.isComposing = isComposing;
                 
-                archivedMessage.messageId = (message.isGroupChatMessage && message.hasElementRoomID)? message.elementRoomID : message.elementID;
+                archivedMessage.messageId = (message.isGroupChatMessage && message.hasRoomMessageId)? message.roomMessageId : message.elementID;
                                 
                 if (isOutgoing && !isComposing) {
                     archivedMessage.messageStatus = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusSent;

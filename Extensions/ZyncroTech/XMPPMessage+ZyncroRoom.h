@@ -6,13 +6,14 @@
 //
 //
 
-#import <XMPPFramework/XMPPMessage.h>
+#import "XMPPMessage.h"
 
 @interface XMPPMessage (ZyncroRoom)
 
 - (void)addRoomMessageId:(NSString *)roomMessageId;
 
-- (NSString *)elementRoomID;
-- (BOOL)hasElementRoomID;
+- (NSXMLElement *)roomMessageElement;
+- (NSString *)roomMessageId;
+- (BOOL)hasRoomMessageId;
 
 @end
