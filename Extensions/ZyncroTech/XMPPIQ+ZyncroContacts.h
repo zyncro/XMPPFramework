@@ -10,6 +10,8 @@
 
 @interface XMPPIQ (ZyncroContacts)
 
-- (void)addQueryWithItemsPerPage:(NSString *)itemsPerPage pageNumber:(NSString *)pageNumber;
+- (void)addQueryWithItemsPerPage:(NSUInteger)itemsPerPage pageNumber:(NSUInteger)pageNumber searchText:(NSString *)text;
+- (BOOL)hasSearchQuery;
+- (NSArray *)items;
 
 @end

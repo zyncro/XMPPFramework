@@ -12,15 +12,20 @@
 static NSString *const ZMNameQuery          = @"query";
 static NSString *const ZMNameItemsPerPage   = @"itemsPerPage";
 static NSString *const ZMNamePageNumber     = @"pageNumber";
+static NSString *const ZMNameItem           = @"item";
+static NSString *const ZMNameNick           = @"nick";
+static NSString *const ZMIQResultType       = @"result";
 static NSString *const ZMXMLNSSearch        = @"jabber:iq:search";
 
 @implementation XMPPIQ (ZyncroContacts)
 
 
-
-
-- (void)addQueryWithItemsPerPage:(NSString *)itemsPerPage pageNumber:(NSString *)pageNumber {
-    if (!itemsPerPage || itemsPerPage.length == 0 || pageNumber || pageNumber.length == 0){
+- (void)addQueryWithItemsPerPage:(NSUInteger)itemsPerPage pageNumber:(NSUInteger)pageNumber searchText:(NSString *)text {
+    
+    NSString *pageNumberStr = [NSString stringWithFormat:@"%lu", (unsigned long)pageNumber];
+    NSString *itemsPerPageStr = [NSString stringWithFormat:@"%lu", (unsigned long)itemsPerPage];
+    
+    if (!itemsPerPageStr || itemsPerPageStr.length == 0 || !pageNumberStr || pageNumberStr.length == 0){
         return;
     }
     
@@ -33,8 +38,13 @@ static NSString *const ZMXMLNSSearch        = @"jabber:iq:search";
     */
     
     NSXMLElement *query = [NSXMLElement elementWithName:ZMNameQuery xmlns:ZMXMLNSSearch];
-    NSXMLElement *itemsperpage = [NSXMLElement elementWithName:itemsPerPage stringValue:itemsPerPage];
-    NSXMLElement *pagenumber = [NSXMLElement elementWithName:pageNumber stringValue:pageNumber];
+    NSXMLElement *itemsperpage = [NSXMLElement elementWithName:ZMNameItemsPerPage stringValue:itemsPerPageStr];
+    NSXMLElement *pagenumber = [NSXMLElement elementWithName:ZMNamePageNumber stringValue:pageNumberStr];
+    
+    if (text) {
+        NSXMLElement *nick = [NSXMLElement elementWithName:ZMNameNick stringValue:text];
+        [query addChild:nick];
+    }
     
     [query addChild:itemsperpage];
     [query addChild:pagenumber];
@@ -43,6 +53,22 @@ static NSString *const ZMXMLNSSearch        = @"jabber:iq:search";
 }
 
 
+- (BOOL)hasSearchQuery {
+    NSArray *query = [self elementsForName:ZMNameQuery];
+    if (query.count > 0) {
+        if ([self elementForName:ZMNameQuery xmlns:ZMXMLNSSearch]) {
+            return YES;
+        }
+    }
+    return NO;
+}
 
+- (NSArray *)items {
+    NSArray *items = [NSMutableArray array];
+    if ([self hasSearchQuery]) {
+        items = [[self elementForName:ZMNameQuery] elementsForName:ZMNameItem];
+    }
+    return items;
+}
 
 @end
