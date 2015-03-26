@@ -7,12 +7,11 @@
 //
 
 #import "XMPPMessage+ZyncroRoom.h"
+#import "XMPPMessage+ZyncroExtension.h"
 #import "NSXMLElement+XMPP.h"
 
-static NSString *const ZMNameExtension          = @"x";
 static NSString *const ZMNameRoomMessage        = @"roommessage";
 static NSString *const ZMAttributeRoomMessageId = @"id";
-static NSString *const ZMXMLNSZyncroMessenger   = @"http://www.zyncro.com/messenger";
 
 @implementation XMPPMessage (ZyncroRoom)
 
@@ -24,36 +23,39 @@ static NSString *const ZMXMLNSZyncroMessenger   = @"http://www.zyncro.com/messen
      * <message>
      *      ...
      *      <body>XXX</body>
-     *      <x xmlns="http://www.zyncro.com/messenger">
-     *          <roommessage id="XXX" />
      *      ...
+     *      <x xmlns="http://www.zyncro.com/messenger">
+     *          ...
+     *          <roommessage id="XXX" />
+     *          ...
      *      </x>
      *      ...
      * </message>
      */
-    NSXMLElement *x = [NSXMLElement elementWithName:ZMNameExtension xmlns:ZMXMLNSZyncroMessenger];
     NSXMLElement *roommessage = [NSXMLElement elementWithName:ZMNameRoomMessage];
     [roommessage addAttributeWithName:ZMAttributeRoomMessageId stringValue:roomMessageId];
     
-    [x addChild:roommessage];
-    
-    [self addChild:x];
-}
-
-- (NSXMLElement *)extensionElement {
-    NSXMLElement *x = [self elementForName:ZMNameExtension xmlns:ZMXMLNSZyncroMessenger];
-    return x;
-}
-
-- (NSString *)elementRoomID {
     NSXMLElement *x = [self extensionElement];
-    NSXMLElement *roomMessage  = [x elementForName:ZMNameRoomMessage];
-    NSString *roomMessageId    = [roomMessage attributeStringValueForName:ZMAttributeRoomMessageId];
+    if (!x) {
+        x = [self addExtension];
+    }
+    [x addChild:roommessage];
+}
+
+- (NSXMLElement *)roomMessageElement {
+    NSXMLElement *x             = [self extensionElement];
+    NSXMLElement *roomMessage   = [x elementForName:ZMNameRoomMessage];
+    return roomMessage;
+}
+
+- (NSString *)roomMessageId {
+    NSXMLElement *roomMessage   = [self roomMessageElement];
+    NSString *roomMessageId     = [roomMessage attributeStringValueForName:ZMAttributeRoomMessageId];
     return roomMessageId;
 }
 
-- (BOOL)hasElementRoomID {
-    NSString *roomMessageId = [self elementRoomID];
+- (BOOL)hasRoomMessageId {
+    NSString *roomMessageId = [self roomMessageId];
     return (roomMessageId && roomMessageId.length > 0);
 }
 

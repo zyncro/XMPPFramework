@@ -6,18 +6,20 @@
 //  Copyright (c) 2015 Zyncro Tech. All rights reserved.
 //
 
-#import <XMPPFramework/XMPPMessage.h>
+#import "XMPPMessage.h"
 
 @interface XMPPMessage (ZyncroDocument)
 
-- (void)addDocumentId:(NSString *)documentId withGroupId:(NSString *)documentGroupId;
+- (void)addDocumentId:(NSString *)documentId groupId:(NSString *)documentGroupId andName:(NSString *)documentName;
 
 - (NSXMLElement *)documentElement;
 
 - (NSString *)documentId;
 - (NSString *)documentGroupId;
+- (NSString *)documentName;
 
 - (BOOL)hasDocumentId;
 - (BOOL)hasDocumentGroupId;
+- (BOOL)hasDocumentName;
 
 @end
