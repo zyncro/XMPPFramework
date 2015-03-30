@@ -29,7 +29,7 @@
 @dynamic documentId;
 @dynamic documentGroupId;
 @dynamic uploadDownloadTaskId;
-@dynamic documentFileName;
+@dynamic documentFolderAndFileName;
 @dynamic userString;
 @dynamic type;
 
