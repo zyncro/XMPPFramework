@@ -14,7 +14,7 @@
         <attribute name="bareJidStr" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="body" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="composing" attributeType="Boolean" defaultValueString="NO" indexed="YES" syncable="YES"/>
-        <attribute name="documentFileName" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="documentFolderAndFileName" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="documentGroupId" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="documentId" optional="YES" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="localTimestamp" attributeType="Date" indexed="YES" syncable="YES"/>
