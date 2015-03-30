@@ -410,6 +410,14 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
             return; // Do NOT insert in DB
         }
         
+        XMPPJID *myJid = [self myJIDForXMPPStream:xmppStream];
+        
+        if (message.hasNotification
+            && ([message.notificationType isEqualToString:@"user-banned"] || [message.notificationType isEqualToString:@"user-left"])
+            && [message.notificationUser isEqualToString:myJid.user]) {
+            return; // Do NOT insert in DB
+        }
+        
         XMPPMessageArchiving_Message_CoreDataObject *archivedMessage = nil;
         NSManagedObjectContext *moc = [self managedObjectContext];
         
@@ -421,7 +429,6 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
             return; // Do not insert this one
         }
         
-        XMPPJID *myJid = [self myJIDForXMPPStream:xmppStream];
         if (!isOutgoing && message.body.length > 0 && [message.from.resource isEqualToString:myJid.user] && !message.hasNotification) {
             // If the message was sent by me (group echo), do NOT insert it in the DB.
             return;
@@ -540,7 +547,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
             }
 			// Create or update contact (if message with actual content)
 			
-			if ([messageBody length] > 0)
+			if ([messageBody length] > 0 || message.hasNotification)
 			{
 				BOOL didCreateNewContact = NO;
                 XMPPMessageArchiving_Contact_CoreDataObject *contact;
