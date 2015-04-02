@@ -735,7 +735,7 @@ enum XMPPRosterFlags
             //[xmppRosterStorage clearAllUsersAndResourcesForXMPPStream:xmppStream];
             [self _setPopulatingRoster:YES];
             [multicastDelegate xmppRosterDidBeginPopulating:self];
-			//[xmppRosterStorage beginRosterPopulationForXMPPStream:xmppStream];
+			[xmppRosterStorage beginRosterPopulationForXMPPStream:xmppStream];
 		}
 		
 		NSArray *items = [query elementsForName:@"item"];
@@ -930,7 +930,7 @@ enum XMPPRosterFlags
     }
     else
     {
-        //[xmppRosterStorage clearAllResourcesForXMPPStream:xmppStream];
+        [xmppRosterStorage clearAllResourcesForXMPPStream:xmppStream];
     }
 	
 	[self _setRequestedRoster:NO];
