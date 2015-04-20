@@ -1,7 +1,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 #import "XMPP.h"
-
+#import "XMPPMessageArchiving_Message_CoreDataObject.h"
 
 @interface XMPPMessageArchiving_Contact_CoreDataObject : NSManagedObject
 
@@ -14,6 +14,9 @@
 
 @property (nonatomic, strong) NSString * streamBareJidStr;
 @property (assign, nonatomic) int16_t badgeUnreadMessages;
+
+@property (assign, nonatomic) XMPPMessageArchiving_Message_CoreDataObjectMessageType mostRecentMessageType;
+@property (nonatomic, strong) NSString * mostRecentMessageUserStr;
 
 /**
  * This method is called immediately before the object is inserted into the managedObjectContext.

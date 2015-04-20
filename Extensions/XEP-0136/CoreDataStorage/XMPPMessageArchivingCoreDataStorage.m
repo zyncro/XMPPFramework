@@ -575,6 +575,8 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 				contact.mostRecentMessageTimestamp = archivedMessage.remoteTimestamp;
 				contact.mostRecentMessageBody = archivedMessage.body;
 				contact.mostRecentMessageOutgoing = @(isOutgoing);
+                contact.mostRecentMessageType = archivedMessage.type;
+                contact.mostRecentMessageUserStr = archivedMessage.userString;
                 contact.badgeUnreadMessages = (isOutgoing) ? 0 : contact.badgeUnreadMessages + 1;
                 
 				XMPPLogVerbose(@"New contact: %@", contact);

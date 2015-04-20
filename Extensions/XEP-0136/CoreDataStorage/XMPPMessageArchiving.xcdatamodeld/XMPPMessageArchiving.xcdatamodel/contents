@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6751" systemVersion="14C1510" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6751" systemVersion="14D131" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="XMPPMessageArchiving_Contact_CoreDataObject" representedClassName="XMPPMessageArchiving_Contact_CoreDataObject" syncable="YES">
         <attribute name="badgeUnreadMessages" optional="YES" attributeType="Integer 16" minValueString="0" defaultValueString="0" syncable="YES"/>
         <attribute name="bareJid" optional="YES" transient="YES" syncable="YES"/>
@@ -7,6 +7,8 @@
         <attribute name="mostRecentMessageBody" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="mostRecentMessageOutgoing" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="mostRecentMessageTimestamp" optional="YES" attributeType="Date" indexed="YES" syncable="YES"/>
+        <attribute name="mostRecentMessageType" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="5" defaultValueString="0" syncable="YES"/>
+        <attribute name="mostRecentMessageUserStr" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="streamBareJidStr" attributeType="String" indexed="YES" syncable="YES"/>
     </entity>
     <entity name="XMPPMessageArchiving_Message_CoreDataObject" representedClassName="XMPPMessageArchiving_Message_CoreDataObject" syncable="YES">
@@ -31,7 +33,7 @@
         <attribute name="userString" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="XMPPMessageArchiving_Contact_CoreDataObject" positionX="-182" positionY="198" width="128" height="148"/>
+        <element name="XMPPMessageArchiving_Contact_CoreDataObject" positionX="-182" positionY="198" width="128" height="178"/>
         <element name="XMPPMessageArchiving_Message_CoreDataObject" positionX="160" positionY="192" width="128" height="330"/>
     </elements>
 </model>

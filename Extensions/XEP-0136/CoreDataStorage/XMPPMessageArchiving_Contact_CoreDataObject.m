@@ -18,6 +18,8 @@
 @dynamic mostRecentMessageOutgoing;
 @dynamic streamBareJidStr;
 @dynamic badgeUnreadMessages;
+@synthesize mostRecentMessageType;
+@synthesize mostRecentMessageUserStr;
 
 #pragma mark Transient bareJid
 
