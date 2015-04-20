@@ -528,6 +528,9 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 }
                 
                 XMPPLogVerbose(@"New archivedMessage: %@", archivedMessage);
+                
+                //  Fix NSConflict
+                [moc setMergePolicy:NSOverwriteMergePolicy];
                                                              
                 if (didCreateNewArchivedMessage) // [archivedMessage isInserted] doesn't seem to work
                 {
