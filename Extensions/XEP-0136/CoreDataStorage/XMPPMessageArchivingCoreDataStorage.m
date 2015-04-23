@@ -225,9 +225,11 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
         messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserLeft;
     } else if ([notificationType isEqualToString:@"user-banned"]) {
         messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomUserBanned;
-    } else if ([notificationType isEqualToString:@"room-destroyed"]) {
+    } else if ([notificationType isEqualToString:@"room-created"]) {
+        messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomCreated;
+    }  else if ([notificationType isEqualToString:@"room-destroyed"]) {
         messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeRoomDestroyed;
-    } else {
+    }else {
         messageType = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeDefault;
     }
     return messageType;
@@ -380,7 +382,12 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
     BOOL isComposing = NO;
 	BOOL shouldDeleteComposingMessage = NO;
     BOOL isCarbonMessage = ([message.from.bare isEqualToString:[xmppStream myJID].bare] && !isOutgoing)? YES : NO;
-	
+    
+    
+    if (message.isGroupChatMessage && !message.elementID && !message.hasRoomMessageId) {
+        return;
+    }
+    
 	if ([messageBody length] == 0 && !message.hasNotification)
 	{
 		// Message doesn't have a body.

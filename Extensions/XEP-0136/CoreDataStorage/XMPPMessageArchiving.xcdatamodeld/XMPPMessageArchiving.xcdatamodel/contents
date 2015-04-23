@@ -7,7 +7,7 @@
         <attribute name="mostRecentMessageBody" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="mostRecentMessageOutgoing" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
         <attribute name="mostRecentMessageTimestamp" optional="YES" attributeType="Date" indexed="YES" syncable="YES"/>
-        <attribute name="mostRecentMessageType" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="5" defaultValueString="0" syncable="YES"/>
+        <attribute name="mostRecentMessageType" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="6" defaultValueString="0" syncable="YES"/>
         <attribute name="mostRecentMessageUserStr" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="streamBareJidStr" attributeType="String" indexed="YES" syncable="YES"/>
     </entity>
@@ -28,12 +28,12 @@
         <attribute name="remoteTimestamp" optional="YES" attributeType="Date" indexed="YES" syncable="YES"/>
         <attribute name="streamBareJidStr" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="thread" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="type" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="5" defaultValueString="0" syncable="YES"/>
+        <attribute name="type" optional="YES" attributeType="Integer 16" minValueString="0" maxValueString="6" defaultValueString="0" syncable="YES"/>
         <attribute name="uploadDownloadTaskId" optional="YES" attributeType="String" indexed="YES" syncable="YES"/>
         <attribute name="userString" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
     <elements>
-        <element name="XMPPMessageArchiving_Contact_CoreDataObject" positionX="-182" positionY="198" width="128" height="178"/>
+        <element name="XMPPMessageArchiving_Contact_CoreDataObject" positionX="-182" positionY="198" width="128" height="180"/>
         <element name="XMPPMessageArchiving_Message_CoreDataObject" positionX="160" positionY="192" width="128" height="330"/>
     </elements>
 </model>
