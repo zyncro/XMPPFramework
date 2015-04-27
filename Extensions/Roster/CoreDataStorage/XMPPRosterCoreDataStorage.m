@@ -344,7 +344,8 @@ static XMPPRosterCoreDataStorage *sharedInstance;
 			{
 				if (user)
 				{
-					[moc deleteObject:user];
+                    //  In order to keep the user in our Local Roster, the next line is commented.
+					//[moc deleteObject:user];
 				}
 			}
 			else
