@@ -930,7 +930,7 @@ enum XMPPRosterFlags
     }
     else
     {
-        //[xmppRosterStorage clearAllResourcesForXMPPStream:xmppStream];
+        [xmppRosterStorage clearAllResourcesForXMPPStream:xmppStream];
     }
 	
 	[self _setRequestedRoster:NO];
