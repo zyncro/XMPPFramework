@@ -7,6 +7,7 @@
 #import "XMPPMessage+ZyncroDocument.h" // Add <document id="xxx" groupId="zzz" /> element to XMPPMessage
 #import "XMPPMessage+ZyncroRoom.h"     // Add <roommessage id="xxx"></roomMessageId> element to XMPPMessage
 #import "XMPPMessage+ZyncroRoomNotification.h"
+#import "XMPPMessage+ZyncroHistory.h" // Add <message history="1" /> attribute to XMPPMessage
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -460,7 +461,8 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
             BOOL didCreateNewArchivedMessage = NO;
             if (isOutgoing) {
                 archivedMessage = [self archivedMessageWithMessageId:message.elementID inManagedObjectContext:moc];
-            } else {
+            }
+            if (!archivedMessage) {
             	archivedMessage = (XMPPMessageArchiving_Message_CoreDataObject *)
 					[[NSManagedObject alloc] initWithEntity:[self messageEntity:moc]
 				             insertIntoManagedObjectContext:nil];
@@ -496,10 +498,34 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 archivedMessage.localTimestamp = [[NSDate alloc] init];
                 
                 NSDate *timestamp = [message delayedDeliveryDate];
-                if (timestamp)
+                if (timestamp) {
                     archivedMessage.remoteTimestamp = timestamp;
-                else
+                } else {
                     archivedMessage.remoteTimestamp = archivedMessage.localTimestamp;
+                }
+                
+                
+                if (message.hasHistoryFlag && timestamp) {
+                    // Historic message
+                    //  Incrementar/Decrementar la hora del servidor según el UTC del móvil
+                    archivedMessage.remoteTimestamp = timestamp;
+                    
+                    // Get oldest message for this conversation
+                    NSDate *oldestTimestamp = [self oldestLocalTimestampForBareJIDStr:messageJid.bare inManagedObjectContext:moc];
+                    if (!oldestTimestamp) {
+                        // No messages in DB for this conversation
+                        // Use server time
+                        archivedMessage.localTimestamp = timestamp;
+                    } else {
+                        // Set oldest timestamp - 1 second to historic messages so they appear up in the conversation
+                        // (they are sorted by localTimestamp)
+                        archivedMessage.localTimestamp = [NSDate dateWithTimeInterval:-1.0f sinceDate:oldestTimestamp];
+                    }
+                    
+                }
+                
+                
+                
                 
                 archivedMessage.thread = message.thread;
                 archivedMessage.isOutgoing = isOutgoing;
@@ -616,6 +642,29 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 			}
 		}
 	}];
+}
+
+- (NSDate *)oldestLocalTimestampForBareJIDStr:(NSString *)bareJIDStr inManagedObjectContext:(NSManagedObjectContext *)moc {
+    NSDate *oldestLocalTimestamp;
+    
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    request.entity      = [self messageEntity:moc];
+    request.predicate = [NSPredicate predicateWithFormat:@"bareJidStr == %@", bareJIDStr];
+    request.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"localTimestamp" ascending:YES]];
+    request.fetchLimit  = 1;
+    
+    NSError *error;
+    NSArray *messages = [moc executeFetchRequest:request error:&error];
+    
+    XMPPMessageArchiving_Message_CoreDataObject *message = nil;
+    if (messages.count == 0) {
+        XMPPLogError(@"No oldest local timestamp found for bare JID '%@'. Setting nil", bareJIDStr);
+        oldestLocalTimestamp = nil;
+    } else {
+        message = messages[0];
+        oldestLocalTimestamp = message.localTimestamp;
+    }
+    return oldestLocalTimestamp;
 }
 
 @end
