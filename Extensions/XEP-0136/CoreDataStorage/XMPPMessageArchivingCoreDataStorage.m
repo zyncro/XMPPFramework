@@ -605,6 +605,12 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 					
 					didCreateNewContact = YES;
 				}
+                
+                NSString *bareJidStr = (isCarbonMessage) ? message.to.bare : archivedMessage.bareJid.bare;
+                
+                if ([self countMessagesForBareJIDStr:bareJidStr inManagedObjectContext:[self managedObjectContext]] > 0 && message.hasHistoryFlag) {
+                    return;
+                }
 				
                 contact.bareJid = (isCarbonMessage) ? message.to : archivedMessage.bareJid;
                 contact.streamBareJidStr = archivedMessage.streamBareJidStr;
@@ -666,5 +672,17 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
     }
     return oldestLocalTimestamp;
 }
+
+- (NSUInteger)countMessagesForBareJIDStr:(NSString *)bareJIDStr inManagedObjectContext:(NSManagedObjectContext *)moc {
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    request.entity      = [self contactEntity:moc];
+    request.predicate = [NSPredicate predicateWithFormat:@"bareJidStr == %@", bareJIDStr];
+    
+    NSError *error;
+    NSArray *messages = [moc executeFetchRequest:request error:&error];
+    
+    return messages.count;
+}
+
 
 @end
