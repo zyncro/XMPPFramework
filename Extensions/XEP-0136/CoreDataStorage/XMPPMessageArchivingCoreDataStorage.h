@@ -9,7 +9,7 @@
 @protocol XMPPMessageArchivingCoreDataStorageDelegate <NSObject>
 
 @optional
-- (void)xmppMessageArchivingCoreDataStorage:(XMPPMessageArchivingCoreDataStorage *)xmppMessageArchivingCoreDataStorage didCreateUser:(XMPPMessageArchiving_Contact_CoreDataObject *)contact;
+- (void)xmppMessageArchivingCoreDataStorage:(XMPPMessageArchivingCoreDataStorage *)xmppMessageArchivingCoreDataStorage didCreateUser:(XMPPMessageArchiving_Contact_CoreDataObject *)contact withMessage:(XMPPMessageArchiving_Message_CoreDataObject *)message;
 
 @end
 

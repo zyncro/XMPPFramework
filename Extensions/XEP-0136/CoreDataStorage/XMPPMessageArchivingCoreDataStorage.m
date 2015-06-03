@@ -6,8 +6,8 @@
 #import "XMPPMessage+XEP0045.h"
 #import "XMPPMessage+ZyncroDocument.h" // Add <document id="xxx" groupId="zzz" /> element to XMPPMessage
 #import "XMPPMessage+ZyncroRoom.h"     // Add <roommessage id="xxx"></roomMessageId> element to XMPPMessage
-#import "XMPPMessage+ZyncroRoomNotification.h"
-#import "XMPPMessage+ZyncroHistory.h" // Add <message history="1" /> attribute to XMPPMessage
+#import "XMPPMessage+ZyncroRoomNotification.h" // Add  <notification type="XXX" jid="YYY" /> element to XMPPMessage
+#import "XMPPMessage+ZyncroHistory.h" // Add <message history="1" /> attribute to XMPPMessage222222222
 
 #if ! __has_feature(objc_arc)
 #warning This file must be compiled with ARC. Use -fobjc-arc flag (or convert project to ARC).
@@ -604,7 +604,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
 					             insertIntoManagedObjectContext:nil];
 					
 					didCreateNewContact = YES;
-				}
+                }
                 
                 NSString *bareJidStr = (isCarbonMessage) ? message.to.bare : archivedMessage.bareJid.bare;
                 
@@ -634,8 +634,8 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                     //  Notify delegate
                     if (_delegate
                         && [_delegate conformsToProtocol:@protocol(XMPPMessageArchivingCoreDataStorageDelegate)]
-                        && [_delegate respondsToSelector:@selector(xmppMessageArchivingCoreDataStorage:didCreateUser:)]) {
-                        [_delegate xmppMessageArchivingCoreDataStorage:self didCreateUser:contact];
+                        && [_delegate respondsToSelector:@selector(xmppMessageArchivingCoreDataStorage:didCreateUser:withMessage:)]) {
+                        [_delegate xmppMessageArchivingCoreDataStorage:self didCreateUser:contact withMessage:archivedMessage];
                     }
 				}
 				else
