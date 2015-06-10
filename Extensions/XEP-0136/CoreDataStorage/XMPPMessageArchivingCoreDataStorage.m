@@ -211,7 +211,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
     
     XMPPMessageArchiving_Message_CoreDataObject *message = nil;
     if (messages.count == 0) {
-        XMPPLogError(@"Error, no archived message with id '%@' found.", messageId);
+        XMPPLogWarn(@"Error, no archived message with id '%@' found.", messageId);
     } else {
         message = messages[0];
     }
@@ -429,7 +429,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
         XMPPMessageArchiving_Message_CoreDataObject *archivedMessage = nil;
         NSManagedObjectContext *moc = [self managedObjectContext];
         
-        if (messageBody.length > 0 && message.isErrorMessage && message.elementID.length > 0) {
+        if (messageBody.length > 0 && message.elementID.length > 0 && message.isErrorMessage) {
             // If we receive an error message with body & ID, it means there was an error sending
             // this message. Mark the archived message as 'Failed' and do NOT insert this new one.
             archivedMessage = [self archivedMessageWithMessageId:message.elementID inManagedObjectContext:moc];
@@ -500,13 +500,16 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 NSDate *timestamp = [message delayedDeliveryDate];
                 if (timestamp) {
                     archivedMessage.remoteTimestamp = timestamp;
-                } else {
-                    archivedMessage.remoteTimestamp = archivedMessage.localTimestamp;
                 }
+//                else {
+//                    archivedMessage.remoteTimestamp = archivedMessage.localTimestamp;
+//                }
                 
                 
                 if (message.hasHistoryFlag && timestamp) {
                     // Historic message
+                    archivedMessage.isHistory = YES;
+                    
                     //  Incrementar/Decrementar la hora del servidor según el UTC del móvil
                     archivedMessage.remoteTimestamp = timestamp;
                     

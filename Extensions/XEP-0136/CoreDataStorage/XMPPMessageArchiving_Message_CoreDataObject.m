@@ -164,6 +164,16 @@
 	self.composing = @(flag);
 }
 
+- (BOOL)isHistory
+{
+    return [self.history boolValue];
+}
+
+- (void)setIsHistory:(BOOL)flag
+{
+    self.history = @(flag);
+}
+
 #pragma mark Hooks
 
 - (void)willInsertObject

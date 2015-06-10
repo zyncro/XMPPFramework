@@ -66,6 +66,9 @@ typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageType)
 @property (nonatomic, strong) NSNumber * composing;   // Use isComposing
 @property (nonatomic, assign) BOOL isComposing;       // Convenience property
 
+@property (nonatomic, strong) NSNumber * history;   // Use isHistory
+@property (nonatomic, assign) BOOL isHistory;       // Convenience property
+
 @property (nonatomic, strong) NSDate * localTimestamp;
 @property (nonatomic, strong) NSDate * remoteTimestamp;
 
