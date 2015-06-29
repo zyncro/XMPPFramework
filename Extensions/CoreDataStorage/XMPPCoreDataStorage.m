@@ -679,6 +679,7 @@ static NSMutableSet *databaseFileNames;
 		
 		managedObjectContext.persistentStoreCoordinator = coordinator;
 		managedObjectContext.undoManager = nil;
+        managedObjectContext.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
 		
 		[self didCreateManagedObjectContext];
 	}
@@ -715,11 +716,6 @@ static NSMutableSet *databaseFileNames;
 	if (coordinator)
 	{
 		XMPPLogVerbose(@"%@: Creating mainThreadManagedObjectContext", [self class]);
-        
-        [self executeBlock:^{
-            NSManagedObjectContext *backgroundMOC = [self managedObjectContext];
-            backgroundMOC.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
-        }];
 		
 		if ([NSManagedObjectContext instancesRespondToSelector:@selector(initWithConcurrencyType:)])
 			mainThreadManagedObjectContext =
