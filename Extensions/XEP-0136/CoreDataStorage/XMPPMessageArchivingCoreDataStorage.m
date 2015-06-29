@@ -211,7 +211,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
     
     XMPPMessageArchiving_Message_CoreDataObject *message = nil;
     if (messages.count == 0) {
-        XMPPLogError(@"Error, no archived message with id '%@' found.", messageId);
+        XMPPLogWarn(@"Error, no archived message with id '%@' found.", messageId);
     } else {
         message = messages[0];
     }
@@ -429,7 +429,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
         XMPPMessageArchiving_Message_CoreDataObject *archivedMessage = nil;
         NSManagedObjectContext *moc = [self managedObjectContext];
         
-        if (messageBody.length > 0 && message.isErrorMessage && message.elementID.length > 0) {
+        if (messageBody.length > 0 && message.elementID.length > 0 && message.isErrorMessage) {
             // If we receive an error message with body & ID, it means there was an error sending
             // this message. Mark the archived message as 'Failed' and do NOT insert this new one.
             archivedMessage = [self archivedMessageWithMessageId:message.elementID inManagedObjectContext:moc];
@@ -563,8 +563,8 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                 XMPPLogVerbose(@"New archivedMessage: %@", archivedMessage);
                 
                 //  Fix NSConflict
-                [moc setMergePolicy:NSOverwriteMergePolicy];
-                                                             
+//                [moc setMergePolicy:NSOverwriteMergePolicy];
+                
                 if (didCreateNewArchivedMessage) // [archivedMessage isInserted] doesn't seem to work
                 {
                     XMPPLogVerbose(@"Inserting message...");

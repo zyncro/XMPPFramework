@@ -715,6 +715,11 @@ static NSMutableSet *databaseFileNames;
 	if (coordinator)
 	{
 		XMPPLogVerbose(@"%@: Creating mainThreadManagedObjectContext", [self class]);
+        
+        [self executeBlock:^{
+            NSManagedObjectContext *backgroundMOC = [self managedObjectContext];
+            backgroundMOC.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
+        }];
 		
 		if ([NSManagedObjectContext instancesRespondToSelector:@selector(initWithConcurrencyType:)])
 			mainThreadManagedObjectContext =
