@@ -557,6 +557,7 @@ static XMPPMessageArchivingCoreDataStorage *sharedInstance;
                     archivedMessage.type            = XMPPMessageArchiving_Message_CoreDataObjectMessageTypeAttachment;
                     archivedMessage.documentId      = message.documentId;
                     archivedMessage.documentGroupId = message.documentGroupId;
+                    archivedMessage.documentURL     = message.documentURL;
                     archivedMessage.messageStatus   = XMPPMessageArchiving_Message_CoreDataObjectMessageStatusToDownload;
                 }
                 

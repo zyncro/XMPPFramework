@@ -10,16 +10,18 @@
 
 @interface XMPPMessage (ZyncroDocument)
 
-- (void)addDocumentId:(NSString *)documentId groupId:(NSString *)documentGroupId andName:(NSString *)documentName;
+- (void)addDocumentId:(NSString *)documentId groupId:(NSString *)documentGroupId name:(NSString *)documentName andURL:(NSString *)documentURL;
 
 - (NSXMLElement *)documentElement;
 
 - (NSString *)documentId;
 - (NSString *)documentGroupId;
 - (NSString *)documentName;
+- (NSString *)documentURL;
 
 - (BOOL)hasDocumentId;
 - (BOOL)hasDocumentGroupId;
 - (BOOL)hasDocumentName;
+- (BOOL)hasDocumentURL;
 
 @end

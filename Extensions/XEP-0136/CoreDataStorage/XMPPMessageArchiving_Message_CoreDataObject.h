@@ -78,6 +78,7 @@ typedef NS_ENUM(int16_t, XMPPMessageArchiving_Message_CoreDataObjectMessageType)
 @property (strong, nonatomic) NSString *documentGroupId;            // Attachment's parent group in messages
 @property (strong, nonatomic) NSString *uploadDownloadTaskId;       // Attachment local upload/download task ID to track network progress
 @property (strong, nonatomic) NSString *documentFolderAndFileName;  // Attachment folder and file name (e.g. 'folder/file.txt')
+@property (strong, nonatomic) NSString *documentURL;                // Attachment's download URL
 
 @property (strong, nonatomic) NSString *userString;
 @property (assign, nonatomic) XMPPMessageArchiving_Message_CoreDataObjectMessageType type;
